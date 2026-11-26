@@ -1,4 +1,5 @@
-DRAFT — NOT SENT.
+SENT — 26 November 2026, 20:49 Europe/Rome.
+Official OpenStore Telegram group: https://web.telegram.org/k/#-1358111548
 
 Hello OpenStore maintainers,
 
@@ -9,7 +10,8 @@ Source and build instructions: https://github.com/MiLattanzio/UTCIEID
 Build: ./scripts/build-click.sh
 Dependencies and pinned Avalonia source revision are documented in README.md.
 Tests: dotnet test tests/UTCie.Tests/UTCie.Tests.csproj -c Release
-Privacy: docs/privacy.md; permission details: docs/keyring.md.
+Privacy: https://github.com/MiLattanzio/UTCIEID/blob/master/docs/privacy.md
+Permission details: https://github.com/MiLattanzio/UTCIEID/blob/master/docs/keyring.md
 
 The normal Click requests networking, nfc and camera. It supports CIE level-3
 authentication with QR, physical NFC card and OTP, tested through a real INPS login.
@@ -22,7 +24,8 @@ plaintext files, send them to our own server, access fingerprint data or record 
 
 This needs extra session D-Bus permission for org.freedesktop.Secret.* and related
 Properties/Introspectable calls on /org/freedesktop/secrets{,/**}, restricted to the
-service peer label. The exact tested rules are in packaging/secret-service.apparmor.rules.
+service peer label. The exact tested rules are here:
+https://github.com/MiLattanzio/UTCIEID/blob/master/packaging/secret-service.apparmor.rules
 On the development device only this app's profile was extended, remaining in enforce.
 The current Click does not install that manual policy modification on other devices.
 Secret Service itself does not isolate credentials by calling app; this limitation
@@ -36,6 +39,7 @@ Review package: utcieid.milattanzio_0.2.0_arm64.click (46,666,918 bytes).
 SHA-256: fdde5cced54412ce9026bb64502b23ec60e87d1deb973504d5a1a95bb27f30b3
 The package passed the automated store checks. The OpenStore listing remains
 unpublished pending this permission review.
+Draft management page: https://open-store.io/manage/utcieid.milattanzio/
 The same package was installed on the development phone with its previously
 authorized app-specific policy extension; a synthetic keyring probe passed.
 

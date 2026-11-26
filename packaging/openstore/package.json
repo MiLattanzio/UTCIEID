@@ -6,7 +6,7 @@
   "sha256": "fdde5cced54412ce9026bb64502b23ec60e87d1deb973504d5a1a95bb27f30b3",
   "automated_tests_passed": 182,
   "automatic_keyring_permission": false,
-  "status": "uploaded_unpublished_manual_permission_review_prepared",
+  "status": "uploaded_unpublished_manual_permission_review_requested",
   "maintainer": "Mi Lattanzio <mi@polecola.it>",
   "device_verification": {
     "device": "Fairphone 5",

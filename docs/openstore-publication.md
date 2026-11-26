@@ -24,7 +24,7 @@ La prima verifica automatica aveva rifiutato il formato incompleto del campo
 maintainer. Il pacchetto sopra corregge quel campo e ha superato il controllo.
 Le funzioni dell'app restano quelle verificate nelle [prove](verification.md).
 
-## Revisione manuale ancora da richiedere
+## Revisione manuale richiesta, in attesa di risposta
 
 L'esito automatico riguarda il profilo standard con networking, NFC e fotocamera.
 **Non approva né installa il permesso Secret Service** necessario a conservare PIN,
@@ -36,10 +36,15 @@ manuale. Non sono stati aggiunti un profilo unconfined o accesso indiscriminato
 al session bus. La pubblicazione resta disattivata finché i manutentori non
 indicano e approvano una modalità di distribuzione adatta per il portachiavi.
 
-La [richiesta pronta](../packaging/openstore/manual-review-request.txt) contiene
+La [richiesta inviata](../packaging/openstore/manual-review-request.txt) contiene
 sorgenti, istruzioni di build, impronta del pacchetto, permessi esatti e limiti di
-isolamento di Secret Service. È una **bozza non inviata**: non sono stati contattati
-i manutentori tramite messaggi esterni. Il passaggio successivo è sottoporla
-tramite il contatto indicato nelle [regole OpenStore](https://open-store.io/submit/),
-concordare i permessi, quindi verificare l'installazione senza modifiche manuali
-prima di rendere pubblica la versione completa.
+isolamento di Secret Service. Su istruzione esplicita del maintainer è stata
+inviata il **26 novembre 2026 alle 20:49 (Europe/Rome)** nel
+[gruppo Telegram ufficiale OpenStore](https://web.telegram.org/k/#-1358111548),
+indicato nelle [regole OpenStore](https://open-store.io/submit/). Il messaggio
+pubblicato è stato verificato nell'interfaccia Telegram; non è un'approvazione
+del permesso né la conferma dell'avvio della revisione da parte dei manutentori.
+
+Il passaggio successivo è ricevere le indicazioni dei manutentori, concordare i
+permessi, quindi verificare l'installazione senza modifiche manuali prima di
+rendere pubblica la versione completa.

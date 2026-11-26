@@ -31,5 +31,7 @@
   "publication_status": "draft_not_published",
   "management_url": "https://open-store.io/manage/utcieid.milattanzio/",
   "maintainer": "Mi Lattanzio <mi@polecola.it>",
-  "manual_review_status": "request_prepared_not_sent"
+  "manual_review_status": "request_sent_awaiting_response",
+  "manual_review_sent_at": "2026-11-26 20:49 Europe/Rome",
+  "manual_review_channel": "https://web.telegram.org/k/#-1358111548"
 }
