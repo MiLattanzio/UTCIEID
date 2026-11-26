@@ -1,0 +1,48 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="UTCIEID.App.App" RequestedThemeVariant="Light">
+  <Application.Styles>
+    <FluentTheme />
+    <Style Selector="Window">
+      <Setter Property="FontFamily" Value="avares://Avalonia.Fonts.Inter/Assets#Inter" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="Foreground" Value="#142E48" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="MinHeight" Value="48" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="18,12" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#006F78" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="MinHeight" Value="52" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="Padding" Value="12" />
+    </Style>
+    <Style Selector="ComboBox">
+      <Setter Property="MinHeight" Value="48" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="TabItem">
+      <Setter Property="MinHeight" Value="52" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="Padding" Value="14,12" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="#52677B" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="LineHeight" Value="23" />
+    </Style>
+    <Style Selector="TextBlock.title">
+      <Setter Property="FontSize" Value="24" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+  </Application.Styles>
+</Application>

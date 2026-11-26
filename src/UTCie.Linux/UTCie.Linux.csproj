@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../UTCie.Sdk/UTCie.Sdk.csproj" />
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.94.1" />
+    <InternalsVisibleTo Include="UTCie.Tests" />
+  </ItemGroup>
+</Project>

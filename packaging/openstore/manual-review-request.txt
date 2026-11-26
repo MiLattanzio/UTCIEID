@@ -1,0 +1,38 @@
+DRAFT — NOT SENT.
+
+Hello OpenStore maintainers,
+
+I am preparing UTCIEID (utcieid.milattanzio), an independent open-source Italian
+electronic identity card client for Ubuntu Touch 24.04-2.x ARM64.
+
+Source and build instructions: https://github.com/MiLattanzio/UTCIEID
+Build: ./scripts/build-click.sh
+Dependencies and pinned Avalonia source revision are documented in README.md.
+Tests: dotnet test tests/UTCie.Tests/UTCie.Tests.csproj -c Release
+Privacy: docs/privacy.md; permission details: docs/keyring.md.
+
+The normal Click requests networking, nfc and camera. It supports CIE level-3
+authentication with QR, physical NFC card and OTP, tested through a real INPS login.
+Camera QR scanning and autofocus have also been verified on a Fairphone 5.
+
+The full application stores the user's chosen full CIE PIN, authentication
+certificate and optionally imported document portrait in the system Secret Service
+login keyring. The CIE private key never leaves the card. We do not store PINs in
+plaintext files, send them to our own server, access fingerprint data or record camera frames.
+
+This needs extra session D-Bus permission for org.freedesktop.Secret.* and related
+Properties/Introspectable calls on /org/freedesktop/secrets{,/**}, restricted to the
+service peer label. The exact tested rules are in packaging/secret-service.apparmor.rules.
+On the development device only this app's profile was extended, remaining in enforce.
+The current Click does not install that manual policy modification on other devices.
+Secret Service itself does not isolate credentials by calling app; this limitation
+is explicitly documented, and our code addresses only UTCIEID-owned attributes.
+
+Could you advise on an accepted way to package this scoped Secret Service permission
+and review the full application? The standard policy groups do not expose Secret
+Service. We have not changed the app to an unconfined template or bypassed review.
+
+The store screenshots are generated from the real AXAML with synthetic fixtures,
+marked DEMO, and contain no personal identity data.
+
+Thank you.

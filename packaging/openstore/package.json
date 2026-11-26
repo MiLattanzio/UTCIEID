@@ -1,0 +1,10 @@
+{
+  "version": "0.2.0",
+  "architecture": "arm64",
+  "filename": "utcieid.milattanzio_0.2.0_arm64.click",
+  "bytes": 46666866,
+  "sha256": "0347bdb3b068d053d3eec87bf218be772f216d9eb0cec9e0ebfe283bcca2b281",
+  "automated_tests_passed": 182,
+  "automatic_keyring_permission": false,
+  "status": "prepared_for_manual_review"
+}

@@ -1,0 +1,213 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:UTCIEID.App"
+        x:Class="UTCIEID.App.MainWindow" x:DataType="local:MainViewModel"
+        Title="UTCIEID" Width="420" Height="840" MinWidth="320" MinHeight="480"
+        Background="#F4F7F9">
+  <Window.Resources><local:PortraitConverter x:Key="PortraitConverter" /></Window.Resources>
+  <Grid x:Name="Page" RowDefinitions="Auto,Auto,*,Auto">
+    <Border Background="#112E49" Padding="22,20">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="3">
+          <TextBlock Text="UTCIEID" Foreground="White" FontWeight="Bold" FontSize="24" LetterSpacing="1" />
+          <TextBlock Text="La tua CIE su Ubuntu Touch" Foreground="#B8CFDF" FontSize="13" />
+        </StackPanel>
+        <Border Grid.Column="1" Background="#25465C" CornerRadius="16" Padding="10,6" VerticalAlignment="Center">
+          <TextBlock Text="ANTEPRIMA" Foreground="#C2EDE5" FontSize="10" FontWeight="SemiBold" />
+        </Border>
+      </Grid>
+    </Border>
+    <Border Grid.Row="1" IsVisible="{Binding HasNfcGuide}" Background="{Binding NfcGuideColor}" Padding="20,16" BorderBrush="#89AFA6" BorderThickness="0,0,0,1">
+      <StackPanel Spacing="6">
+        <TextBlock Text="{Binding NfcGuideTitle}" FontSize="21" FontWeight="Bold" TextWrapping="Wrap" Foreground="#123C36" />
+        <TextBlock Text="{Binding Otp}" IsVisible="{Binding HasOtp}" FontSize="42" FontWeight="Bold" LetterSpacing="10" HorizontalAlignment="Center" />
+        <TextBlock Text="{Binding NfcGuideDetail}" FontSize="14" TextWrapping="Wrap" Foreground="#284C49" />
+        <ProgressBar IsIndeterminate="True" IsVisible="{Binding Busy}" Height="4" Margin="0,4,0,0" />
+      </StackPanel>
+    </Border>
+    <ScrollViewer x:Name="ContentScroll" Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Margin="18,6,18,22" Spacing="20" MaxWidth="520">
+        <TabControl SelectedIndex="{Binding SelectedTab}" IsEnabled="{Binding NotBusy}">
+          <TabItem Header="CIE">
+            <StackPanel Spacing="18" Margin="0,16,0,0">
+              <Border CornerRadius="20" Background="#DDEEEB" Padding="20,16">
+                <StackPanel Spacing="12">
+                  <Grid Height="84" Width="164" HorizontalAlignment="Left">
+                    <Border CornerRadius="12" Background="#F9F8F1" BorderBrush="#A8C9C1" BorderThickness="1" Padding="16">
+                      <Grid RowDefinitions="Auto,*" ColumnDefinitions="42,*">
+                        <TextBlock Grid.ColumnSpan="2" Text="CARTA D'IDENTITÀ" FontSize="10" FontWeight="Bold" Foreground="#3B6C6B" />
+                        <Border Grid.Row="1" Background="#C0D9D4" CornerRadius="6" Margin="0,13,0,0">
+                          <Path Data="M 21,7 A 7,7 0 1 1 20.9,7 M 8,37 C 8,19 34,19 34,37 Z" Fill="#6F9C95" Stretch="Uniform" Margin="7" />
+                        </Border>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="7" Margin="12,17,0,0">
+                          <Border Height="5" Background="#9ABAB4" CornerRadius="2" />
+                          <Border Height="5" Width="58" HorizontalAlignment="Left" Background="#C0D9D4" CornerRadius="2" />
+                          <Border Height="5" Width="70" HorizontalAlignment="Left" Background="#C0D9D4" CornerRadius="2" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </Grid>
+                  <TextBlock Classes="title" Text="La tua CIE, con te." />
+                  <TextBlock Classes="muted" Text="La tua carta, pronta per accedere ai servizi online." />
+                </StackPanel>
+              </Border>
+              <StackPanel Spacing="10">
+                <TextBlock Classes="muted" Text="Registra la CIE 3.0 con il PIN di 8 cifre, poi accedi avvicinandola al retro del telefono." />
+              </StackPanel>
+              <Border IsVisible="{Binding HasCertificate}" Background="#E0F1E9" CornerRadius="12" Padding="16">
+                <TextBlock Text="{Binding Certificate}" TextWrapping="Wrap" />
+              </Border>
+            </StackPanel>
+          </TabItem>
+          <TabItem Header="Accedi">
+            <StackPanel Spacing="16" Margin="0,16,0,0">
+              <TextBlock Classes="title" Text="Entra con la tua CIE" />
+              <TextBlock Classes="muted" Text="Dal computer scegli «Entra con lettura carta» e «Prosegui con smartphone». Scansiona il QR con la fotocamera per ottenere il codice OTP." />
+              <Button Content="Scansiona QR" Command="{Binding ScanQrCommand}" IsEnabled="{Binding NotBusy}" HorizontalAlignment="Stretch" />
+              <TextBlock Text="Ambiente del servizio" FontWeight="SemiBold" />
+              <ComboBox ItemsSource="{Binding Environments}" SelectedIndex="{Binding EnvironmentIndex}" />
+              <Expander Header="Incolla un link" HorizontalAlignment="Stretch">
+                <TextBox Text="{Binding RequestLink}" PlaceholderText="Link del QR o OpenApp" MaxLength="65536"
+                         TextInputOptions.ContentType="Url" TextInputOptions.IsSensitive="True"
+                         TextInputOptions.ShowSuggestions="False" Margin="0,10,0,0" />
+              </Expander>
+              <TextBlock Text="{Binding RequestService}" FontWeight="SemiBold" TextWrapping="Wrap" />
+              <TextBlock Classes="muted" Text="Con un QR di livello 3 compare un OTP da inserire sul computer. I link OpenApp continuano nel browser. I QR di livello 2 non sono supportati." />
+            </StackPanel>
+          </TabItem>
+          <TabItem Header="Dati" IsVisible="{Binding HasRegistration}">
+            <StackPanel Spacing="18" Margin="0,16,0,0">
+              <TextBlock Classes="title" Text="La carta registrata" />
+              <Border IsVisible="{Binding NeedsProfile}" Background="#E4EEF8" CornerRadius="12" Padding="16">
+                <StackPanel Spacing="12">
+                  <TextBlock Classes="muted" Text="Questa CIE è già registrata. Rileggila una volta per salvare i dati e il certificato, usando il PIN del portachiavi." />
+                  <Button Content="Importa dati e certificato" Command="{Binding ContinueCommand}" IsEnabled="{Binding CanContinue}" HorizontalAlignment="Stretch" />
+                </StackPanel>
+              </Border>
+              <StackPanel Spacing="16" IsVisible="{Binding HasProfile}">
+                <Border Background="#DDEEEB" CornerRadius="16" Padding="18">
+                  <StackPanel Spacing="12">
+                    <Image Source="{Binding Document, Converter={StaticResource PortraitConverter}}" IsVisible="{Binding HasDocument}"
+                           Width="150" Height="190" Stretch="Uniform" HorizontalAlignment="Left" />
+                    <TextBlock Classes="muted" Text="Nome" FontSize="13" />
+                    <TextBlock Text="{Binding GivenName}" FontSize="21" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    <TextBlock Classes="muted" Text="Cognome" FontSize="13" />
+                    <TextBlock Text="{Binding Surname}" FontSize="21" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    <TextBlock Classes="muted" Text="Numero del documento" FontSize="13" />
+                    <TextBlock Text="{Binding DocumentNumber}" FontWeight="SemiBold" />
+                  </StackPanel>
+                </Border>
+                <TextBlock Text="Codice fiscale" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding FiscalCode}" TextWrapping="Wrap" />
+                <TextBlock Text="Cittadinanza" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding Nationality}" />
+                <StackPanel Spacing="10" IsVisible="{Binding HasDocument}">
+                  <TextBlock Text="Data di nascita (anno a due cifre nella MRZ)" FontWeight="SemiBold" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding DocumentBirth}" />
+                  <TextBlock Text="Scadenza del documento (MRZ)" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding DocumentExpiry}" />
+                  <TextBlock Text="Sesso" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Sex}" />
+                  <TextBlock Classes="muted" FontSize="13" Text="Integrità dei dati e firma del documento controllate. La verifica della catena dell'autorità emittente non è ancora disponibile." />
+                </StackPanel>
+                <Expander Header="Certificato di autenticazione" IsExpanded="False" HorizontalAlignment="Stretch">
+                  <StackPanel Spacing="10" Margin="0,10">
+                    <TextBlock Text="Intestatario" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding CertificateSubject}" TextWrapping="Wrap" />
+                    <TextBlock Text="Emittente" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding CertificateIssuer}" TextWrapping="Wrap" />
+                    <TextBlock Text="Validità" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding CertificateValidity}" TextWrapping="Wrap" />
+                    <TextBlock Text="Numero di serie" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding CertificateSerial}" TextWrapping="Wrap" />
+                    <TextBlock Text="Impronta SHA-256 del certificato" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding CertificateFingerprint}" TextWrapping="Wrap" FontSize="12" />
+                    <TextBlock Classes="muted" Text="Il certificato completo è salvato sul dispositivo. La chiave privata resta nella CIE." FontSize="13" />
+                  </StackPanel>
+                </Expander>
+                <Border Background="White" BorderBrush="#DCE5EB" BorderThickness="1" CornerRadius="12" Padding="16">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Foto e dati del documento" FontWeight="SemiBold" FontSize="18" />
+                    <TextBlock Classes="muted" Text="Inserisci il CAN di 6 cifre stampato sulla CIE. Allontana la carta, premi «Importa foto e dati» e riavvicinala. Questa lettura non usa il PIN. Il CAN non viene salvato." />
+                    <TextBox x:Name="CanInput" Text="{Binding Can}" MaxLength="6" PlaceholderText="CAN · 6 cifre" IsEnabled="{Binding NotBusy}"
+                             TextInputOptions.ContentType="Digits" TextInputOptions.IsSensitive="True" TextInputOptions.ShowSuggestions="False" />
+                    <Button Classes="primary" Content="Importa foto e dati" Command="{Binding ImportDocumentCommand}" IsEnabled="{Binding CanImportDocument}" HorizontalAlignment="Stretch" />
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+              <TextBlock Text="Impronte digitali" FontWeight="SemiBold" />
+              <TextBlock Classes="muted" Text="Non accessibili alle app: la lettura è riservata alle autorità con specifiche autorizzazioni." />
+              <TextBlock Classes="muted" FontSize="13" Text="Dati, foto e certificato sono conservati nel portachiavi del dispositivo e restano disponibili dopo la chiusura dell'app." />
+              <Button Content="Dimentica carta, dati e PIN" Command="{Binding ForgetCardCommand}" IsEnabled="{Binding NotBusy}" HorizontalAlignment="Stretch" />
+            </StackPanel>
+          </TabItem>
+          <TabItem Header="Info">
+            <StackPanel Spacing="16" Margin="0,16,0,0">
+              <TextBlock Classes="title" Text="Un accesso più vicino." />
+              <TextBlock Classes="muted" Text="UTCIEID è un progetto indipendente per Ubuntu Touch, basato sul porting C# dell'SDK Android CIE di IPZS. Non è l'app ufficiale CieID." />
+              <TextBlock Text="Il tuo PIN resta sul telefono" FontWeight="SemiBold" />
+              <TextBlock Classes="muted" Text="Se registri la carta, il PIN completo viene conservato nel portachiavi di sistema. Non è scritto nei file dell'app né inviato al servizio di autenticazione. La chiave privata resta nella carta. Puoi eliminare la registrazione in qualsiasi momento." />
+              <TextBlock Text="Cosa serve" FontWeight="SemiBold" />
+              <TextBlock Classes="muted" Text="CIE 3.0, PIN di 8 cifre, NFC attivo e connessione Internet per l'accesso. Le due metà del PIN sono fornite al rilascio e alla consegna della carta." />
+              <TextBlock Text="Funzioni disponibili" FontWeight="SemiBold" />
+              <TextBlock Classes="muted" Text="Dati e certificato della carta, foto tramite CAN, accesso OpenApp e scansione QR di livello 3 con fotocamera e OTP. Recupero PIN, sblocco con PUK, notifiche e QR di livello 2 non sono inclusi." />
+              <TextBlock Classes="muted" Text="Versione 0.2.0 · Anteprima di sviluppo&#10;SDK derivato da IPZS · Licenza BSD-3-Clause&#10;Interfaccia Avalonia · Licenza MIT" FontSize="13" />
+            </StackPanel>
+          </TabItem>
+        </TabControl>
+        <StackPanel Spacing="12" IsVisible="{Binding ShowActions}">
+          <Button Content="Trova la CIE (senza PIN)" Command="{Binding LocateCardCommand}" IsEnabled="{Binding NotBusy}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+          <Border IsVisible="{Binding HasRegistration}" Background="#DDEEEB" CornerRadius="12" Padding="14">
+            <StackPanel Spacing="8">
+              <TextBlock Text="CIE registrata" FontWeight="SemiBold" />
+              <CheckBox Content="Usa il PIN dal portachiavi" IsChecked="{Binding UseSavedPin}" IsEnabled="{Binding NotBusy}" MinHeight="48" />
+              <Button Content="Dimentica carta e PIN" Command="{Binding ForgetCardCommand}" IsEnabled="{Binding NotBusy}" />
+            </StackPanel>
+          </Border>
+          <TextBlock Text="PIN della CIE" FontWeight="SemiBold" IsVisible="{Binding EnterPin}" />
+          <TextBox x:Name="PinInput" Text="{Binding Pin}" PasswordChar="●" MaxLength="8" PlaceholderText="8 cifre"
+                   IsEnabled="{Binding NotBusy}" IsVisible="{Binding EnterPin}" TextInputOptions.ContentType="Digits"
+                   TextInputOptions.IsSensitive="True" TextInputOptions.ShowSuggestions="False"
+                   TextInputOptions.AutoCapitalization="False" />
+          <CheckBox IsVisible="{Binding CanRegister}" IsEnabled="{Binding NotBusy}" IsChecked="{Binding RememberCard}" MinHeight="48">
+            <TextBlock Text="Registra la CIE e salva il PIN nel portachiavi dopo la lettura" TextWrapping="Wrap" FontSize="14" />
+          </CheckBox>
+          <TextBlock Classes="muted" FontSize="13" Text="Nessun tentativo viene ripetuto automaticamente. Il PIN salvato è usato solo con la carta registrata." />
+        </StackPanel>
+        <Button Content="Annulla lettura" Command="{Binding CancelCommand}" IsVisible="{Binding Busy}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        <Border Background="White" BorderBrush="#DCE5EB" BorderThickness="1" CornerRadius="14" Padding="16">
+          <StackPanel Spacing="9">
+            <TextBlock Text="{Binding Status}" TextWrapping="Wrap" FontWeight="SemiBold" />
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding Busy}" Height="4" />
+            <TextBlock Classes="muted" Text="{Binding Detail}" FontSize="14" />
+            <Button Content="Ricontrolla NFC" Command="{Binding RefreshCommand}" IsEnabled="{Binding NotBusy}" FontSize="14" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+    <Border Grid.Row="3" Padding="16,10" Background="#E9EFF3">
+      <StackPanel Spacing="8">
+        <Button Classes="primary" Content="{Binding ActionLabel}" Command="{Binding ContinueCommand}" IsEnabled="{Binding CanContinue}" IsVisible="{Binding ShowActions}" HorizontalAlignment="Stretch" />
+        <Button Classes="primary" Content="Continua nel browser" Command="{Binding OpenBrowserCommand}" IsVisible="{Binding HasCompletion}" HorizontalAlignment="Stretch" />
+        <TextBlock Text="Progetto indipendente · non è l'app ufficiale CieID" FontSize="11" Foreground="#52677B" HorizontalAlignment="Center" />
+      </StackPanel>
+    </Border>
+    <Border Grid.RowSpan="4" IsVisible="{Binding ScanningQr}" Background="#112E49" Padding="18">
+      <Grid RowDefinitions="Auto,*,Auto" RowSpacing="14">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Inquadra il QR CIE" FontSize="24" FontWeight="Bold" Foreground="White" />
+          <TextBlock Text="Usa la fotocamera posteriore per leggere il codice sul computer." Foreground="#C8DDE9" TextWrapping="Wrap" />
+        </StackPanel>
+        <Grid Grid.Row="1" ClipToBounds="True" Background="#071B2A" Tapped="OnCameraTapped">
+          <TextBlock Text="Avvio della fotocamera…&#10;Consenti l'accesso se richiesto." TextAlignment="Center" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Image x:Name="CameraPreview" Stretch="Uniform" />
+          <Border Width="240" Height="240" BorderThickness="3" BorderBrush="#84E5CF" CornerRadius="16" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+        </Grid>
+        <StackPanel Grid.Row="2" Spacing="10">
+          <TextBlock Text="Tocca l'anteprima per mettere a fuoco. Il QR viene letto automaticamente, senza salvare immagini." Foreground="#C8DDE9" TextWrapping="Wrap" FontSize="13" />
+          <Button Content="Annulla scansione" Command="{Binding CancelCommand}" HorizontalAlignment="Stretch" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

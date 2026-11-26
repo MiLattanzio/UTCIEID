@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=UTCIEID
+Comment=La tua CIE su Ubuntu Touch
+Exec=./launch.sh %u
+Icon=icon.svg
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true
+X-Ubuntu-XMir-Enable=true
+MimeType=x-scheme-handler/utcieid;

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/UTCie.Sdk/UTCie.Sdk.csproj" />
+    <ProjectReference Include="../../src/UTCie.Linux/UTCie.Linux.csproj" />
+    <Compile Include="../../src/UTCIEID.App/MainViewModel.cs" Link="MainViewModel.cs" />
+    <Compile Include="../../src/UTCIEID.App/QrImageReader.cs" Link="QrImageReader.cs" />
+    <PackageReference Include="SkiaSharp" Version="3.119.4" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="NUnit" Version="4.5.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="6.2.0" />
+  </ItemGroup>
+</Project>

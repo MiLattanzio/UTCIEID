@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>UTCIEID</AssemblyName>
+    <RootNamespace>UTCIEID.App</RootNamespace>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishAot>false</PublishAot>
+    <PublishSingleFile>false</PublishSingleFile>
+    <UseAvaloniaSource Condition="'$(UseAvaloniaSource)' == ''">true</UseAvaloniaSource>
+    <IncludeAvaloniaGenerators>true</IncludeAvaloniaGenerators>
+    <IncludeDevGenerators>false</IncludeDevGenerators>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../UTCie.Linux/UTCie.Linux.csproj" />
+    <AvaloniaResource Include="Assets/**" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseAvaloniaSource)' == 'true'">
+    <ProjectReference Include="$(AvaloniaSourceRoot)/src/Avalonia.Desktop/Avalonia.Desktop.csproj" />
+    <ProjectReference Include="$(AvaloniaSourceRoot)/src/Avalonia.Wayland/Avalonia.Wayland.csproj" />
+    <ProjectReference Include="$(AvaloniaSourceRoot)/src/Avalonia.Themes.Fluent/Avalonia.Themes.Fluent.csproj" />
+    <ProjectReference Include="$(AvaloniaSourceRoot)/src/Avalonia.Fonts.Inter/Avalonia.Fonts.Inter.csproj" />
+    <ProjectReference Include="$(AvaloniaSourceRoot)/packages/Avalonia/Avalonia.csproj" />
+  </ItemGroup>
+  <Import Project="$(AvaloniaSourceRoot)/build/BuildTargets.targets" Condition="'$(UseAvaloniaSource)' == 'true'" />
+  <Import Project="$(AvaloniaSourceRoot)/build/SourceGenerators.props" Condition="'$(UseAvaloniaSource)' == 'true'" />
+  <ItemGroup Condition="'$(UseAvaloniaSource)' != 'true'">
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Wayland" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.6" />
+  </ItemGroup>
+</Project>
