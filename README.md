@@ -31,6 +31,10 @@ La [privacy dell'app](docs/privacy.md) descrive conservazione locale e dati
 trasmessi per l'autenticazione. Le [schermate dimostrative](packaging/openstore/screenshots/)
 sono generate dall'AXAML con dati sintetici e non contengono dati personali reali.
 
+Il pacchetto 0.2.0 e le cinque schermate sono caricati in una bozza OpenStore.
+La pubblicazione della versione completa attende la revisione del permesso per
+il portachiavi; dettagli e richiesta pronta in [stato OpenStore](docs/openstore-publication.md).
+
 ## Uso
 
 1. Attiva NFC e apri **Trova la CIE (senza PIN)**. Sposta lentamente la carta sul

@@ -2,9 +2,19 @@
   "version": "0.2.0",
   "architecture": "arm64",
   "filename": "utcieid.milattanzio_0.2.0_arm64.click",
-  "bytes": 46666866,
-  "sha256": "0347bdb3b068d053d3eec87bf218be772f216d9eb0cec9e0ebfe283bcca2b281",
+  "bytes": 46666918,
+  "sha256": "fdde5cced54412ce9026bb64502b23ec60e87d1deb973504d5a1a95bb27f30b3",
   "automated_tests_passed": 182,
   "automatic_keyring_permission": false,
-  "status": "prepared_for_manual_review"
+  "status": "uploaded_unpublished_manual_permission_review_prepared",
+  "maintainer": "Mi Lattanzio <mi@polecola.it>",
+  "device_verification": {
+    "device": "Fairphone 5",
+    "os": "Ubuntu Touch 24.04.5",
+    "installed_sha256_matches": true,
+    "apparmor": "enforce",
+    "synthetic_keyring_probe": "passed",
+    "keyring_extension": "previously_authorized_app_profile_only"
+  },
+  "automated_store_review": "passed"
 }

@@ -206,3 +206,30 @@ APDU. Per avviare una nuova importazione si allontana e riavvicina la carta.
 
 Pacchetto con importazione reale della foto riuscita: SHA-256
 `890a4d7ec4b7066515930f6e3161d2f385ed06609118c4982deed8523f253561`.
+
+## Pacchetto preparato per OpenStore (26 novembre 2026)
+
+La build 0.2.0 include tutte le funzioni già provate, le licenze dei componenti
+incorporati e non contiene i simboli PDB. La suite completa ha superato
+182 test, senza fallimenti. Sono stati controllati i file dell'archivio Click:
+nessuna registrazione, chiave privata, schermata o fixture dimostrativa inclusa.
+
+Installata sul Fairphone 5 ricollegato via ADB; avvio riuscito e processo sotto
+AppArmor `enforce`. Ripristinata la stessa estensione Secret Service già
+autorizzata per il solo profilo UTCIEID. La prova del portachiavi con PIN e
+certificato sintetici è riuscita, senza modificare la registrazione reale.
+L'hash del pacchetto trasferito coincide con quello locale:
+`0347bdb3b068d053d3eec87bf218be772f216d9eb0cec9e0ebfe283bcca2b281`.
+
+Questa verifica sul dispositivo di sviluppo non risolve la distribuzione del
+permesso aggiuntivo: il Click standard non installa l'estensione del portachiavi.
+La revisione OpenStore deve stabilire una modalità accettata prima della
+pubblicazione della versione completa.
+
+Corretto poi il solo campo maintainer nel formato richiesto da OpenStore, con
+nome e indirizzo indicati dall'utente. Il pacchetto definitivo è stato installato
+e la prova sintetica del portachiavi ha avuto nuovamente esito positivo sotto
+AppArmor enforce. Il controllo automatico OpenStore è stato superato:
+`fdde5cced54412ce9026bb64502b23ec60e87d1deb973504d5a1a95bb27f30b3`.
+Questo esito riguarda il profilo Click standard e non approva l'estensione
+Secret Service richiesta per la distribuzione completa.

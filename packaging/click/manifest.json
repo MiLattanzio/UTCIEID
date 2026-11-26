@@ -3,7 +3,7 @@
   "title": "UTCIEID",
   "version": "0.2.0",
   "description": "Client CIE indipendente per Ubuntu Touch, con frontend Avalonia e SDK C#.",
-  "maintainer": "UTCIEID contributors",
+  "maintainer": "Mi Lattanzio <mi@polecola.it>",
   "architecture": "arm64",
   "framework": "ubuntu-touch-24.04-2.x",
   "hooks": {

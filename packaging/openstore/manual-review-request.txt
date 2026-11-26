@@ -32,7 +32,16 @@ Could you advise on an accepted way to package this scoped Secret Service permis
 and review the full application? The standard policy groups do not expose Secret
 Service. We have not changed the app to an unconfined template or bypassed review.
 
+Review package: utcieid.milattanzio_0.2.0_arm64.click (46,666,918 bytes).
+SHA-256: fdde5cced54412ce9026bb64502b23ec60e87d1deb973504d5a1a95bb27f30b3
+The package passed the automated store checks. The OpenStore listing remains
+unpublished pending this permission review.
+The same package was installed on the development phone with its previously
+authorized app-specific policy extension; a synthetic keyring probe passed.
+
 The store screenshots are generated from the real AXAML with synthetic fixtures,
 marked DEMO, and contain no personal identity data.
 
-Thank you.
+Thank you,
+Mi Lattanzio
+mi@polecola.it
