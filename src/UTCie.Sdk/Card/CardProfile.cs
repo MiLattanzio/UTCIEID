@@ -23,10 +23,10 @@ public sealed record CardProfile(string ServiceIdHash, byte[] CertificateDer, Da
 
     public void Validate()
     {
-        if (ServiceIdHash.Length != 64 || ServiceIdHash.Any(c => !Uri.IsHexDigit(c)) || CertificateDer.Length is < 1 or > 32768)
+        if (ServiceIdHash is not { Length: 64 } || ServiceIdHash.Any(c => !Uri.IsHexDigit(c)) || CertificateDer is null || CertificateDer.Length is < 1 or > 32768)
             throw new CardProtocolException("Profilo della carta non valido.");
         _ = GetCertificateDetails();
-        if (Document is not null && (Document.Portrait.Length is < 1 or > 1048576 || Document.Sod.Length > 65536 || Document.Mrz.Length != 90))
+        if (Document is not null && (Document.Portrait is null || Document.Portrait.Length is < 1 or > 1048576 || Document.Sod is null || Document.Sod.Length > 65536 || Document.Mrz is not { Length: 90 }))
             throw new CardProtocolException("Dati del documento non validi.");
     }
 }

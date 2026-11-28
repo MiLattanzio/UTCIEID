@@ -1,7 +1,7 @@
 {
   "name": "utcieid.milattanzio",
   "title": "UTCIEID",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Client CIE indipendente per Ubuntu Touch, con frontend Avalonia e SDK C#.",
   "maintainer": "Mi Lattanzio <mi@polecola.it>",
   "architecture": "arm64",

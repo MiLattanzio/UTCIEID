@@ -4,4 +4,7 @@
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.94.1" />
     <InternalsVisibleTo Include="UTCie.Tests" />
   </ItemGroup>
+  <ItemGroup Condition="'$(EnableLegacyMigration)' != 'true'">
+    <Compile Remove="SecretServicePinStore.cs;SecretServiceCardProfile.cs" />
+  </ItemGroup>
 </Project>

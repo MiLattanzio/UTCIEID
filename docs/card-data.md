@@ -32,10 +32,10 @@ con il certificato incorporato e hash di entrambi i data group. La fiducia nella
 CA nazionale e la prova anti-clonazione ICAO sono ancora da aggiungere: la UI lo
 esplicita e non dichiara il documento autenticato dalle autorità.
 
-Il profilo e la foto originale vengono conservati in Secret Service, con il
-certificato. Non sono inviati a server e non vengono creati file temporanei con
-dati personali. La consultazione successiva non richiede NFC. Il CAN non è salvato.
-Vedere [portachiavi](keyring.md) per attributi, limiti e autorizzazione AppArmor.
+Il profilo e la foto originale possono essere conservati con il certificato
+nell'[archivio cifrato](vault.md). Senza archivio restano solo nella sessione.
+Non vengono creati file temporanei in chiaro con dati personali. La consultazione
+successiva richiede lo sblocco dell'archivio, senza NFC. Il CAN non è salvato.
 
 ## Provenienza e fonti
 

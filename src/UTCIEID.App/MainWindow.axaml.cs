@@ -33,6 +33,11 @@ public partial class MainWindow : Window
         };
         this.FindControl<TextBox>("CanInput")!.GotFocus += (_, _) => Dispatcher.UIThread.Post(() => this.FindControl<TextBox>("CanInput")!.BringIntoView(), DispatcherPriority.Background);
         _pinInput.GotFocus += (_, _) => Dispatcher.UIThread.Post(() => _pinInput.BringIntoView(), DispatcherPriority.Background);
+        foreach (string name in new[] { "VaultPasswordInput", "VaultConfirmationInput" })
+        {
+            var field = this.FindControl<TextBox>(name)!;
+            field.GotFocus += (_, _) => Dispatcher.UIThread.Post(() => field.BringIntoView(), DispatcherPriority.Background);
+        }
     }
 
     private async void OnOpened(object? sender, EventArgs e)

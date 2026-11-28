@@ -3,7 +3,39 @@
 Dispositivo: Fairphone 5 ARM64, Ubuntu Touch 24.04.5, connessione USB/ADB.
 Backend UI provato: X11/XMir con il fork Avalonia e Maliit integrato.
 
-## Risultati osservati
+## Archivio cifrato 0.3.0 — 27–28 novembre 2026
+
+- 203 test automatici superati, inclusi Argon2id confrontato con libargon2,
+  integrità dell'archivio, passphrase errata, annullamento, concorrenza, PIN
+  manuale/opzionale e migrazione con verifica prima della rimozione.
+- Build ARM64 finale con il solo profilo standard `networking`, `nfc`, `camera`.
+  Backend Secret Service e relativo comando diagnostico assenti dal pacchetto.
+- Sul Fairphone 5, prova sintetica nella versione finale sotto AppArmor `enforce`:
+  creazione 853 ms, sblocco 465 ms; passphrase errata respinta, certificato e PIN
+  riletti, PIN rimosso separatamente e archivio sintetico eliminato.
+- Un tentativo di leggere le sole proprietà di Secret Service dal profilo 0.3.0
+  è stato respinto da D-Bus con `AccessDenied` causato da AppArmor.
+- Trasferimento locale della carta precedente completato con una build temporanea:
+  verifica del PIN e del profilo dopo nuova decifratura dal disco; rimozione della
+  vecchia registrazione. L'utente ha confermato foto e certificato presenti.
+  Il file cifrato ha permessi 0600. Nessun codice o dato della carta è nei log.
+- L'utente ha confermato lo sblocco della versione finale, foto e certificato
+  presenti e lettura della CIE riuscita senza reinserire il PIN.
+- L'utente ha confermato anche la lettura reale con PIN manuale e archivio
+  bloccato, senza modificare i dati salvati.
+- Corretto il messaggio dopo il blocco dell'archivio: stato sempre visibile
+  nell'intestazione e istruzione esplicita per usare il PIN salvato. Le nove
+  regressioni della UI dell'archivio sono state rieseguite con esito positivo.
+- Cinque schermate rigenerate dall'AXAML con dati sintetici e icona del volto;
+  includono il nuovo archivio facoltativo. Nessuna schermata reale del telefono.
+- Click finale: 46.682.292 byte, SHA-256
+  `22bccbbf279766ed17c3285f6996592892a93856a0ea9f5be6047cd6868e8aba`.
+  Audit di 276 elementi: nessun PDB, chiave privata o archivio personale.
+
+Le sezioni successive documentano le prove precedenti, compreso il vecchio
+portachiavi di sviluppo, sostituito nella versione 0.3.0.
+
+## Risultati storici della prima versione
 
 - Compilazione dai sorgenti Avalonia e pacchetto Click ARM64 self-contained riusciti.
 - Avvio confinato e stato NFC disponibile tramite `org.neard`.

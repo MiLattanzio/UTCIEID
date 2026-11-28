@@ -14,6 +14,16 @@ if rg -q 'UTDotNet' "$stage_dir/app/UTCIEID.deps.json"; then
     echo 'Unexpected UTDotNet dependency.' >&2
     exit 1
 fi
+migration_build=false
+for argument in "$@"; do
+    if [[ "$argument" == '-p:EnableLegacyMigration=true' ]]; then migration_build=true; fi
+done
+if $migration_build; then
+    echo 'Development migration build: do not upload to OpenStore.' >&2
+elif rg -a -q 'SecretServicePinStore' "$stage_dir/app/UTCie.Linux.dll"; then
+    echo 'Unexpected Secret Service backend in the release build.' >&2
+    exit 1
+fi
 # Debug symbols contain workstation source paths and are not needed on devices.
 find "$stage_dir/app" -type f -name '*.pdb' -delete
 cp "$repo_dir"/packaging/click/* "$stage_dir/"

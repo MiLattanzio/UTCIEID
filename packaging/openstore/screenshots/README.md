@@ -16,6 +16,5 @@ dotnet run --project tools/UTCIEID.Screenshots -c Release -- packaging/openstore
 ```
 
 Lo strumento non è incluso nel pacchetto Click. La sequenza mostra la lettura CIE,
-il riconoscimento QR, i dati della carta, il certificato e le informazioni dell'app.
-La disponibilità del salvataggio dei dati dipende dal permesso del portachiavi,
-descritto nella documentazione e nella scheda della release.
+il riconoscimento QR, i dati della carta, il certificato e la creazione dell'archivio
+cifrato facoltativo. La versione 0.3.0 non richiede il portachiavi di sistema.

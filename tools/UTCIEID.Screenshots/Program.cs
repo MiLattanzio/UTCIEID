@@ -47,8 +47,8 @@ window.Close();
 
 model = new MainViewModel(reader, credentials: new DemoStore(false));
 window = Open(model);
-model.SelectedTab = 3;
-Capture(window, "05-informazioni.png");
+model.VaultPanelOpen = true;
+Capture(window, "05-archivio-cifrato.png");
 window.Close();
 Console.WriteLine("Rendered 5 AXAML screenshots with synthetic data only.");
 
@@ -65,7 +65,13 @@ MainWindow Open(MainViewModel viewModel)
 
 void Capture(MainWindow view, string file)
 {
+    // Settle styles/animations before capturing; no camera or real device is involved.
     Dispatcher.UIThread.RunJobs();
+    AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+    Thread.Sleep(250);
+    AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+    Dispatcher.UIThread.RunJobs();
+    view.UpdateLayout();
     // Render at 3x for the same 1224x2595 content size used on the Fairphone.
     using var bitmap = new RenderTargetBitmap(new PixelSize(1224, 2595), new Vector(288, 288));
     bitmap.Render(view);
@@ -80,13 +86,17 @@ sealed class DemoReader : ICardReader
         throw new InvalidOperationException("The screenshot renderer cannot access NFC.");
 }
 
-sealed class DemoStore : ICardCredentialStore, ICardProfileStore
+sealed class DemoStore : ILocalVault
 {
     private readonly RegisteredCard? _card;
     private readonly CardProfile? _profile;
+    public bool Exists => _card is not null;
+    public bool IsUnlocked { get; private set; }
+    public bool HasSavedPin => IsUnlocked && Exists;
     public DemoStore(bool registered)
     {
         if (!registered) return;
+        IsUnlocked = true;
         _card = new(new string('0', 64));
         using var rsa = RSA.Create(2048);
         var name = new X500DistinguishedName("CN=DATI DIMOSTRATIVI, SERIALNUMBER=IDCIT-DEMO00000, G=Esempio, SN=DIMOSTRATIVO, C=IT");
@@ -99,7 +109,14 @@ sealed class DemoStore : ICardCredentialStore, ICardProfileStore
         _profile = new(_card.ServiceIdHash, certificate.RawData, DateTimeOffset.UnixEpoch, document);
     }
     public Task<RegisteredCard?> GetRegistrationAsync(CancellationToken token = default) => Task.FromResult(_card);
-    public Task<CardProfile?> GetProfileAsync(RegisteredCard card, CancellationToken token = default) => Task.FromResult(_profile);
+    public Task<CardProfile?> GetProfileAsync(RegisteredCard card, CancellationToken token = default) => Task.FromResult(_profile is null ? null : _profile with
+        { CertificateDer = _profile.CertificateDer.ToArray(), Document = _profile.Document! with { Portrait = _profile.Document.Portrait.ToArray(), Sod = _profile.Document.Sod.ToArray() } });
+    public Task CreateAsync(ReadOnlyMemory<char> passphrase, CancellationToken token = default) => throw NoSecrets();
+    public Task UnlockAsync(ReadOnlyMemory<char> passphrase, CancellationToken token = default) => throw NoSecrets();
+    public void Lock() => IsUnlocked = false;
+    public Task SaveCardAsync(CardProfile profile, ReadOnlyMemory<char> pin, CancellationToken token = default) => throw NoSecrets();
+    public Task RemovePinAsync(CancellationToken token = default) => throw NoSecrets();
+    public Task DeleteAsync(CancellationToken token = default) => throw NoSecrets();
     public Task<char[]> GetPinAsync(RegisteredCard card, CancellationToken token = default) => throw NoSecrets();
     public Task SaveAsync(RegisteredCard card, ReadOnlyMemory<char> pin, CancellationToken token = default) => throw NoSecrets();
     public Task ForgetAsync(RegisteredCard card, CancellationToken token = default) => throw NoSecrets();

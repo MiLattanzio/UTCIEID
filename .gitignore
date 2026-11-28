@@ -37,6 +37,9 @@ artifacts/
 *.p12
 *.key
 registered-card.json
+vault-v*.bin
+.vault.lock
+.vault-*.tmp
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt

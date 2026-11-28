@@ -11,7 +11,16 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            desktop.MainWindow = new MainWindow { DataContext = new MainViewModel(new NfcdReader(), Program.StartupLink, new SecretServicePinStore()) };
+        {
+            var vault = new EncryptedCardVault();
+            var model = new MainViewModel(new NfcdReader(), Program.StartupLink, vault
+#if LEGACY_MIGRATION
+                , legacyCredentials: new SecretServicePinStore()
+#endif
+            );
+            desktop.MainWindow = new MainWindow { DataContext = model };
+            desktop.Exit += (_, _) => vault.Dispose();
+        }
         base.OnFrameworkInitializationCompleted();
     }
 }

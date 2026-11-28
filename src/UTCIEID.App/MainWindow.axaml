@@ -27,6 +27,41 @@
     </Border>
     <ScrollViewer x:Name="ContentScroll" Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
       <StackPanel Margin="18,6,18,22" Spacing="20" MaxWidth="520">
+        <Expander Header="{Binding VaultHeader}" IsExpanded="{Binding VaultPanelOpen}" IsVisible="{Binding VaultAvailable}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="12" Margin="0,10,0,0">
+            <TextBlock Classes="muted" Text="{Binding VaultSummary}" FontSize="14" />
+            <StackPanel IsVisible="{Binding Error}" Spacing="6">
+              <TextBlock Text="{Binding Status}" TextWrapping="Wrap" FontWeight="SemiBold" Foreground="#8A3024" />
+              <TextBlock Text="{Binding Detail}" TextWrapping="Wrap" FontSize="14" />
+            </StackPanel>
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding Busy}" Height="4" />
+            <StackPanel IsVisible="{Binding !VaultUnlocked}" Spacing="12">
+              <TextBlock Classes="muted" IsVisible="{Binding VaultNeedsCreation}" Text="Scegli una passphrase diversa dal PIN: almeno 12 caratteri, meglio più parole. Servirà a ogni riapertura. Se la dimentichi, dovrai eliminare l'archivio e rileggere la CIE." FontSize="14" />
+              <TextBlock Text="Passphrase dell'archivio" FontWeight="SemiBold" />
+              <TextBox x:Name="VaultPasswordInput" Text="{Binding VaultPassphrase}" PasswordChar="●" IsUndoEnabled="False" MaxLength="1024" IsEnabled="{Binding NotBusy}"
+                       TextInputOptions.ContentType="Password" TextInputOptions.IsSensitive="True" TextInputOptions.ShowSuggestions="False" TextInputOptions.AutoCapitalization="False" />
+              <TextBlock Text="Ripeti la passphrase" IsVisible="{Binding VaultNeedsCreation}" FontWeight="SemiBold" />
+              <TextBox x:Name="VaultConfirmationInput" Text="{Binding VaultConfirmation}" PasswordChar="●" IsUndoEnabled="False" MaxLength="1024" IsEnabled="{Binding NotBusy}" IsVisible="{Binding VaultNeedsCreation}"
+                       TextInputOptions.ContentType="Password" TextInputOptions.IsSensitive="True" TextInputOptions.ShowSuggestions="False" TextInputOptions.AutoCapitalization="False" />
+              <TextBlock Classes="muted" IsVisible="{Binding HasLegacyCard}" Text="Foto, certificato e PIN già registrati verranno trasferiti. La copia precedente sarà rimossa solo dopo aver verificato l'archivio cifrato." FontSize="14" />
+              <Button Content="{Binding CreateVaultLabel}" Command="{Binding CreateVaultCommand}" IsEnabled="{Binding CanOpenVault}" IsVisible="{Binding VaultNeedsCreation}" HorizontalAlignment="Stretch" />
+              <Button Content="Sblocca archivio" Command="{Binding UnlockVaultCommand}" IsEnabled="{Binding CanOpenVault}" IsVisible="{Binding VaultNeedsUnlock}" HorizontalAlignment="Stretch" />
+            </StackPanel>
+            <StackPanel IsVisible="{Binding VaultUnlocked}" Spacing="10" IsEnabled="{Binding NotBusy}">
+              <CheckBox IsChecked="{Binding SaveCardData}"><TextBlock Text="Salva i dati della prossima lettura nell'archivio" TextWrapping="Wrap" FontSize="14" /></CheckBox>
+              <Button Content="Blocca archivio" Command="{Binding LockVaultCommand}" HorizontalAlignment="Stretch" />
+              <Button Content="Rimuovi solo il PIN salvato" Command="{Binding RemoveSavedPinCommand}" IsVisible="{Binding HasSavedPin}" HorizontalAlignment="Stretch" />
+            </StackPanel>
+            <Button Content="Elimina archivio…" Command="{Binding RequestDeleteVaultCommand}" IsEnabled="{Binding NotBusy}" IsVisible="{Binding VaultExists}" HorizontalAlignment="Stretch" />
+            <Border IsVisible="{Binding ConfirmDeleteVault}" Background="#FCEAE7" CornerRadius="10" Padding="12">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Eliminare foto, certificato, dati e PIN salvati? L'operazione non si può annullare. La CIE resta utilizzabile e potrai rileggerla." TextWrapping="Wrap" />
+                <Button Content="Elimina definitivamente" Command="{Binding DeleteVaultCommand}" IsEnabled="{Binding NotBusy}" HorizontalAlignment="Stretch" />
+                <Button Content="Conserva archivio" Command="{Binding CancelDeleteVaultCommand}" HorizontalAlignment="Stretch" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Expander>
         <TabControl SelectedIndex="{Binding SelectedTab}" IsEnabled="{Binding NotBusy}">
           <TabItem Header="CIE">
             <StackPanel Spacing="18" Margin="0,16,0,0">
@@ -77,10 +112,10 @@
           </TabItem>
           <TabItem Header="Dati" IsVisible="{Binding HasRegistration}">
             <StackPanel Spacing="18" Margin="0,16,0,0">
-              <TextBlock Classes="title" Text="La carta registrata" />
+              <TextBlock Classes="title" Text="La tua carta" />
               <Border IsVisible="{Binding NeedsProfile}" Background="#E4EEF8" CornerRadius="12" Padding="16">
                 <StackPanel Spacing="12">
-                  <TextBlock Classes="muted" Text="Questa CIE è già registrata. Rileggila una volta per salvare i dati e il certificato, usando il PIN del portachiavi." />
+                  <TextBlock Classes="muted" Text="Rileggi la CIE per aggiungere dati e certificato, usando il PIN salvato oppure inserendolo manualmente." />
                   <Button Content="Importa dati e certificato" Command="{Binding ContinueCommand}" IsEnabled="{Binding CanContinue}" HorizontalAlignment="Stretch" />
                 </StackPanel>
               </Border>
@@ -122,14 +157,14 @@
                     <TextBlock Text="{Binding CertificateSerial}" TextWrapping="Wrap" />
                     <TextBlock Text="Impronta SHA-256 del certificato" FontWeight="SemiBold" />
                     <TextBlock Text="{Binding CertificateFingerprint}" TextWrapping="Wrap" FontSize="12" />
-                    <TextBlock Classes="muted" Text="Il certificato completo è salvato sul dispositivo. La chiave privata resta nella CIE." FontSize="13" />
+                    <TextBlock Classes="muted" Text="La chiave privata resta nella CIE. Il certificato segue la scelta di salvataggio dei dati." FontSize="13" />
                   </StackPanel>
                 </Expander>
                 <Border Background="White" BorderBrush="#DCE5EB" BorderThickness="1" CornerRadius="12" Padding="16">
                   <StackPanel Spacing="12">
                     <TextBlock Text="Foto e dati del documento" FontWeight="SemiBold" FontSize="18" />
                     <TextBlock Classes="muted" Text="Inserisci il CAN di 6 cifre stampato sulla CIE. Allontana la carta, premi «Importa foto e dati» e riavvicinala. Questa lettura non usa il PIN. Il CAN non viene salvato." />
-                    <TextBox x:Name="CanInput" Text="{Binding Can}" MaxLength="6" PlaceholderText="CAN · 6 cifre" IsEnabled="{Binding NotBusy}"
+                    <TextBox x:Name="CanInput" Text="{Binding Can}" IsUndoEnabled="False" MaxLength="6" PlaceholderText="CAN · 6 cifre" IsEnabled="{Binding NotBusy}"
                              TextInputOptions.ContentType="Digits" TextInputOptions.IsSensitive="True" TextInputOptions.ShowSuggestions="False" />
                     <Button Classes="primary" Content="Importa foto e dati" Command="{Binding ImportDocumentCommand}" IsEnabled="{Binding CanImportDocument}" HorizontalAlignment="Stretch" />
                   </StackPanel>
@@ -137,7 +172,7 @@
               </StackPanel>
               <TextBlock Text="Impronte digitali" FontWeight="SemiBold" />
               <TextBlock Classes="muted" Text="Non accessibili alle app: la lettura è riservata alle autorità con specifiche autorizzazioni." />
-              <TextBlock Classes="muted" FontSize="13" Text="Dati, foto e certificato sono conservati nel portachiavi del dispositivo e restano disponibili dopo la chiusura dell'app." />
+              <TextBlock Classes="muted" FontSize="13" Text="{Binding ProfileStorageNotice}" />
               <Button Content="Dimentica carta, dati e PIN" Command="{Binding ForgetCardCommand}" IsEnabled="{Binding NotBusy}" HorizontalAlignment="Stretch" />
             </StackPanel>
           </TabItem>
@@ -146,12 +181,12 @@
               <TextBlock Classes="title" Text="Un accesso più vicino." />
               <TextBlock Classes="muted" Text="UTCIEID è un progetto indipendente per Ubuntu Touch, basato sul porting C# dell'SDK Android CIE di IPZS. Non è l'app ufficiale CieID." />
               <TextBlock Text="Il tuo PIN resta sul telefono" FontWeight="SemiBold" />
-              <TextBlock Classes="muted" Text="Se registri la carta, il PIN completo viene conservato nel portachiavi di sistema. Non è scritto nei file dell'app né inviato al servizio di autenticazione. La chiave privata resta nella carta. Puoi eliminare la registrazione in qualsiasi momento." />
+              <TextBlock Classes="muted" Text="Puoi inserire il PIN a ogni utilizzo oppure salvarlo, insieme a foto, dati e certificato, in un archivio cifrato con una passphrase separata. L'archivio si blocca quando lasci l'app. La passphrase non viene salvata e il PIN non viene inviato al servizio di autenticazione. La chiave privata resta nella carta." />
               <TextBlock Text="Cosa serve" FontWeight="SemiBold" />
               <TextBlock Classes="muted" Text="CIE 3.0, PIN di 8 cifre, NFC attivo e connessione Internet per l'accesso. Le due metà del PIN sono fornite al rilascio e alla consegna della carta." />
               <TextBlock Text="Funzioni disponibili" FontWeight="SemiBold" />
               <TextBlock Classes="muted" Text="Dati e certificato della carta, foto tramite CAN, accesso OpenApp e scansione QR di livello 3 con fotocamera e OTP. Recupero PIN, sblocco con PUK, notifiche e QR di livello 2 non sono inclusi." />
-              <TextBlock Classes="muted" Text="Versione 0.2.0 · Anteprima di sviluppo&#10;SDK derivato da IPZS · Licenza BSD-3-Clause&#10;Interfaccia Avalonia · Licenza MIT" FontSize="13" />
+              <TextBlock Classes="muted" Text="Versione 0.3.0 · Anteprima di sviluppo&#10;SDK derivato da IPZS · Licenza BSD-3-Clause&#10;Interfaccia Avalonia · Licenza MIT" FontSize="13" />
             </StackPanel>
           </TabItem>
         </TabControl>
@@ -159,18 +194,19 @@
           <Button Content="Trova la CIE (senza PIN)" Command="{Binding LocateCardCommand}" IsEnabled="{Binding NotBusy}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
           <Border IsVisible="{Binding HasRegistration}" Background="#DDEEEB" CornerRadius="12" Padding="14">
             <StackPanel Spacing="8">
-              <TextBlock Text="CIE registrata" FontWeight="SemiBold" />
-              <CheckBox Content="Usa il PIN dal portachiavi" IsChecked="{Binding UseSavedPin}" IsEnabled="{Binding NotBusy}" MinHeight="48" />
+              <TextBlock Text="CIE disponibile" FontWeight="SemiBold" />
+              <CheckBox Content="Usa il PIN dall'archivio" IsChecked="{Binding UseSavedPin}" IsEnabled="{Binding NotBusy}" IsVisible="{Binding HasSavedPin}" MinHeight="48" />
               <Button Content="Dimentica carta e PIN" Command="{Binding ForgetCardCommand}" IsEnabled="{Binding NotBusy}" />
             </StackPanel>
           </Border>
           <TextBlock Text="PIN della CIE" FontWeight="SemiBold" IsVisible="{Binding EnterPin}" />
-          <TextBox x:Name="PinInput" Text="{Binding Pin}" PasswordChar="●" MaxLength="8" PlaceholderText="8 cifre"
+          <TextBlock Classes="muted" IsVisible="{Binding VaultNeedsUnlock}" FontSize="14" Text="Per usare il PIN salvato, sblocca l'archivio in alto con la passphrase. Puoi anche inserire il PIN manualmente qui sotto." />
+          <TextBox x:Name="PinInput" Text="{Binding Pin}" PasswordChar="●" IsUndoEnabled="False" MaxLength="8" PlaceholderText="8 cifre"
                    IsEnabled="{Binding NotBusy}" IsVisible="{Binding EnterPin}" TextInputOptions.ContentType="Digits"
                    TextInputOptions.IsSensitive="True" TextInputOptions.ShowSuggestions="False"
                    TextInputOptions.AutoCapitalization="False" />
           <CheckBox IsVisible="{Binding CanRegister}" IsEnabled="{Binding NotBusy}" IsChecked="{Binding RememberCard}" MinHeight="48">
-            <TextBlock Text="Registra la CIE e salva il PIN nel portachiavi dopo la lettura" TextWrapping="Wrap" FontSize="14" />
+            <TextBlock Text="Salva anche il PIN nell'archivio dopo la lettura" TextWrapping="Wrap" FontSize="14" />
           </CheckBox>
           <TextBlock Classes="muted" FontSize="13" Text="Nessun tentativo viene ripetuto automaticamente. Il PIN salvato è usato solo con la carta registrata." />
         </StackPanel>

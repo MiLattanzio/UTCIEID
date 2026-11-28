@@ -24,7 +24,10 @@ internal static class Program
             catch (Exception e) { Console.Error.WriteLine($"Immagine QR CIE non valida ({e.GetType().Name})."); return 2; }
         }
         if (args.Contains("--probe-nfc")) return ProbeAsync().GetAwaiter().GetResult();
+        #if LEGACY_MIGRATION
         if (args.Contains("--probe-keyring")) return ProbeKeyringAsync().GetAwaiter().GetResult();
+#endif
+        if (args.Contains("--probe-vault")) return VaultProbe.RunAsync().GetAwaiter().GetResult();
         if (args.Contains("--read-card-id")) return ReadIdAsync().GetAwaiter().GetResult();
         if (args.Contains("--probe-card-channel")) return ProbeChannelAsync().GetAwaiter().GetResult();
         StartupLink = args.FirstOrDefault(a => a.StartsWith("https://", StringComparison.Ordinal) || a.StartsWith("utcieid://", StringComparison.Ordinal));
@@ -70,6 +73,8 @@ internal static class Program
         catch { Console.Error.WriteLine("Carta non letta: timeout, rimozione o servizio NFC non disponibile."); return 2; }
     }
 
+
+#if LEGACY_MIGRATION
     private static async Task<int> ProbeKeyringAsync()
     {
         string root = Environment.GetEnvironmentVariable("XDG_CACHE_HOME") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cache");
@@ -109,6 +114,8 @@ internal static class Program
             if (Directory.Exists(directory)) Directory.Delete(directory, true);
         }
     }
+
+#endif
 
     private static async Task<int> ProbeChannelAsync()
     {

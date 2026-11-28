@@ -8,7 +8,7 @@ using IcaoDocumentReader = UTCie.Sdk.Icao.IcaoDocumentReader;
 
 namespace UTCIEID.App;
 
-public sealed class MainViewModel : INotifyPropertyChanged
+public sealed partial class MainViewModel : INotifyPropertyChanged
 {
     private readonly ICardReader _reader;
     private readonly ICardCredentialStore? _credentials;
@@ -36,11 +36,15 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public string[] Environments { get; } = ["Produzione", "Preproduzione", "Collaudo"];
 
     public MainViewModel(ICardReader reader, string? startupLink = null, ICardCredentialStore? credentials = null, ICardProfileStore? profiles = null,
-        ICieQrIdentityProvider? qrProvider = null)
+        ICieQrIdentityProvider? qrProvider = null, ICardCredentialStore? legacyCredentials = null)
     {
         _reader = reader;
         _credentials = credentials;
         _profiles = profiles ?? credentials as ICardProfileStore;
+        _vault = credentials as ILocalVault;
+        _legacyCredentials = legacyCredentials;
+        _rememberCard = _vault is null;
+        InitializeVaultCommands();
         _qrProvider = qrProvider ?? new CieQrIdentityProvider();
         ContinueCommand = new AsyncCommand(ContinueAsync);
         RefreshCommand = new AsyncCommand(RefreshAsync);
@@ -64,7 +68,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public string NfcGuideDetail { get => _nfcGuideDetail; private set => Set(ref _nfcGuideDetail, value); }
     public string NfcGuideColor { get => _nfcGuideColor; private set => Set(ref _nfcGuideColor, value); }
     public bool HasNfcGuide => NfcGuideTitle.Length != 0;
-    public bool Busy { get => _busy; private set { Set(ref _busy, value); Notify(nameof(NotBusy)); Notify(nameof(CanContinue)); Notify(nameof(CanImportDocument)); } }
+    public bool Busy { get => _busy; private set { Set(ref _busy, value); Notify(nameof(NotBusy)); Notify(nameof(CanContinue)); Notify(nameof(CanImportDocument)); Notify(nameof(CanOpenVault)); } }
     public bool NotBusy => !Busy;
     public bool Error { get => _error; private set => Set(ref _error, value); }
     public bool HasCertificate => Certificate.Length != 0;
@@ -83,8 +87,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public bool HasRegistration => _registered is not null;
     public bool UseSavedPin { get => _useSavedPin; set { Set(ref _useSavedPin, value); Pin = ""; Notify(nameof(EnterPin)); Notify(nameof(CanContinue)); Notify(nameof(CanRegister)); } }
     public bool RememberCard { get => _rememberCard; set => Set(ref _rememberCard, value); }
-    public bool EnterPin => !HasRegistration || !UseSavedPin;
-    public bool CanRegister => EnterPin && SelectedTab == 0;
+    public bool EnterPin => !HasSavedPin || !UseSavedPin;
+    public bool CanRegister => EnterPin && SelectedTab == 0 && (_vault is null ? _credentials is not null : VaultUnlocked && SaveCardData);
     public bool ShowActions => SelectedTab < 2;
     public bool CanContinue => !Busy && _nfcReady && (!EnterPin || CiePin.IsValid(Pin));
     public string ActionLabel => SelectedTab == 1 ? IsQrRequest ? "Genera codice OTP" : "Accedi con la CIE" : "Leggi la tua CIE";
@@ -107,7 +111,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public string DocumentExpiry => MrzDate(Document?.DateOfExpiry);
     public string Nationality => Display(Document?.Nationality ?? _identity?.Country);
     public string Sex => Display(Document?.Sex);
-    public bool CanImportDocument => !Busy && _nfcReady && HasProfile && _profiles is not null && Can.Length == 6 && Can.All(char.IsAsciiDigit);
+    public bool CanImportDocument => !Busy && _nfcReady && HasProfile && Can.Length == 6 && Can.All(char.IsAsciiDigit);
     public ICommand ImportDocumentCommand { get; }
     public ICommand ScanQrCommand { get; }
     public ICommand ContinueCommand { get; }
@@ -125,13 +129,13 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _operation = operation;
         try
         {
-            if (_credentials is not null)
+            if (_vault is null || _vault.IsUnlocked) await LoadRegistrationAsync(operation.Token);
+            if (_legacyCredentials is not null)
             {
-                _registered = await _credentials.GetRegistrationAsync(operation.Token);
-                RegistrationChanged();
-                if (_registered is not null && _profiles is not null)
-                    SetProfile(await _profiles.GetProfileAsync(_registered, operation.Token));
+                HasLegacyCard = await _legacyCredentials.GetRegistrationAsync(operation.Token) is not null;
+                if (HasLegacyCard) VaultPanelOpen = true;
             }
+            NotifyVault();
             var status = await _reader.GetStatusAsync(operation.Token);
             _nfcReady = status.Enabled;
             Status = status.Description;
@@ -175,7 +179,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             if (fromKeyring)
             {
-                Status = "Apertura del portachiavi…";
+                Status = "Recupero del PIN dall’archivio…";
                 pin = await _credentials!.GetPinAsync(registered!, operation.Token);
             }
             var client = new CieClient(_reader);
@@ -195,26 +199,44 @@ public sealed class MainViewModel : INotifyPropertyChanged
                 Certificate = $"{cert.Subject}\nCertificato valido fino al {cert.NotAfter:dd/MM/yyyy}";
                 Status = "CIE letta correttamente";
                 Detail = "Puoi allontanare la carta. I dati restano solo in questa sessione.";
-                if (!fromKeyring && RememberCard && _credentials is not null)
+                var document = _profile?.ServiceIdHash == cert.ServiceIdHash ? _profile.Document : null;
+                var profile = new CardProfile(cert.ServiceIdHash, cert.CertificateDer, DateTimeOffset.UtcNow, document);
+                if (_vault is not null)
                 {
-                    Status = "Registrazione nel portachiavi…";
-                    var registration = new RegisteredCard(cert.ServiceIdHash);
-                    await _credentials.SaveAsync(registration, pin, operation.Token);
-                    _registered = registration;
-                    UseSavedPin = true;
-                    RegistrationChanged();
-                    Status = "CIE registrata";
-                    Detail = "Il PIN completo è nel portachiavi. Dal prossimo accesso basta avvicinare questa carta.";
+                    _profileSaved = false;
+                    if (_vault.IsUnlocked && SaveCardData)
+                    {
+                        var stored = await _vault.GetRegistrationAsync(operation.Token);
+                        if (stored is not null && stored.ServiceIdHash != cert.ServiceIdHash)
+                            throw new CredentialStoreException("Nell'archivio c'è un'altra carta. Rimuovila prima di registrarne una nuova.");
+                        await _vault.SaveCardAsync(profile, RememberCard ? pin : ReadOnlyMemory<char>.Empty, operation.Token);
+                        operation.Token.ThrowIfCancellationRequested();
+                        _profileSaved = true;
+                    }
+                    _registered = new(cert.ServiceIdHash);
+                    UseSavedPin = _vault.HasSavedPin && _profileSaved;
+                    Status = _profileSaved ? "CIE registrata nell'archivio" : "CIE letta correttamente";
+                    Detail = _profileSaved ? "Dati e certificato sono nell'archivio cifrato. Puoi aggiungere la foto con il CAN." : "Dati e certificato restano in questa sessione. Nessun PIN è stato salvato.";
                 }
-                if (_registered?.ServiceIdHash == cert.ServiceIdHash && _profiles is not null)
+                else
                 {
-                    var document = _profile?.ServiceIdHash == cert.ServiceIdHash ? _profile.Document : null;
-                    var profile = new CardProfile(cert.ServiceIdHash, cert.CertificateDer, DateTimeOffset.UtcNow, document);
-                    await _profiles.SaveProfileAsync(profile, operation.Token);
-                    SetProfile(profile);
-                    SelectedTab = 2;
-                    Detail = "Dati e certificato salvati nel portachiavi del dispositivo. Per aggiungere la foto usa il CAN stampato sulla CIE.";
+                    if (!fromKeyring && RememberCard && _credentials is not null)
+                    {
+                        await _credentials.SaveAsync(new(cert.ServiceIdHash), pin, operation.Token);
+                        _registered = new(cert.ServiceIdHash);
+                        UseSavedPin = true;
+                        Status = "CIE registrata";
+                    }
+                    if (_registered?.ServiceIdHash == cert.ServiceIdHash && _profiles is not null)
+                    {
+                        await _profiles.SaveProfileAsync(profile, operation.Token);
+                        _profileSaved = true;
+                    }
+                    _registered ??= new(cert.ServiceIdHash);
                 }
+                operation.Token.ThrowIfCancellationRequested();
+                SetProfile(profile); RegistrationChanged(); NotifyVault(); SelectedTab = 2;
+
             }
             else
             {
@@ -228,7 +250,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
         catch (OperationCanceledException) { ClearCompletion(); Status = "Operazione annullata"; Detail = "Quando vuoi riprovare, avvia una nuova lettura."; }
         catch (PinException e) { if (fromKeyring) UseSavedPin = false; Error = true; Status = e.Message; Detail = "Controlla il PIN prima di un nuovo tentativo. Nessun tentativo automatico."; }
-        catch (CredentialStoreException e) { RetainPinForRetry(); Error = true; Status = "Portachiavi non disponibile"; Detail = e.Message; }
+        catch (CredentialStoreException e) { RetainPinForRetry(); Error = true; Status = "Archivio non disponibile"; Detail = e.Message; }
         catch (CardException e) { RetainPinForRetry(); Error = true; Status = e.Message; Detail = "Allontana e riavvicina la carta per una nuova lettura. Il PIN resta disponibile finché l'app è aperta in primo piano."; }
         catch (TimeoutException) { RetainPinForRetry(); Error = true; Status = "Tempo di lettura scaduto"; Detail = "Avvicina la carta all'antenna NFC e riprova. Non occorre reinserire il PIN."; }
         catch (HttpRequestException) { RetainPinForRetry(); Error = true; Status = "Il servizio CIE non ha completato la richiesta"; Detail = "Verifica la connessione e avvia un nuovo accesso dal servizio."; }
@@ -266,7 +288,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private async Task ImportDocumentAsync()
     {
-        if (!CanImportDocument || _registered is null || _profile is null || _profiles is null) return;
+        if (!CanImportDocument || _registered is null || _profile is null) return;
         char[] can = Can.ToCharArray(); Can = "";
         var profile = _profile;
         Busy = true; Error = false; ResetNfcGuide();
@@ -278,10 +300,11 @@ public sealed class MainViewModel : INotifyPropertyChanged
             var document = await new IcaoDocumentReader(_reader).ReadAsync(_registered, _identity!.DocumentNumber, can, progress, operation.Token);
             operation.Token.ThrowIfCancellationRequested();
             var updated = profile with { Document = document };
-            await _profiles.SaveProfileAsync(updated, operation.Token);
+            if (_profileSaved && _profiles is not null) await _profiles.SaveProfileAsync(updated, operation.Token);
+            operation.Token.ThrowIfCancellationRequested();
             SetProfile(updated);
-            Status = "Dati e foto salvati";
-            Detail = "Puoi consultare il documento e il certificato anche senza avvicinare la CIE.";
+            Status = _profileSaved ? "Dati e foto salvati" : "Dati e foto letti";
+            Detail = _profileSaved ? "Foto, dati e certificato sono nell'archivio cifrato." : "Foto e dati restano solo in questa sessione.";
         }
         catch (OperationCanceledException) { Status = "Lettura del documento annullata"; Detail = "I dati salvati in precedenza sono ancora disponibili."; }
         catch (Exception e)
@@ -296,11 +319,20 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private void SetProfile(CardProfile? profile)
     {
         _identity = profile?.GetCertificateDetails();
+        if (_profile is { } previous && previous != profile)
+        {
+            if (!ReferenceEquals(previous.CertificateDer, profile?.CertificateDer)) Array.Clear(previous.CertificateDer);
+            if (previous.Document is { } oldDocument)
+            {
+                if (!ReferenceEquals(oldDocument.Portrait, profile?.Document?.Portrait)) Array.Clear(oldDocument.Portrait);
+                if (!ReferenceEquals(oldDocument.Sod, profile?.Document?.Sod)) Array.Clear(oldDocument.Sod);
+            }
+        }
         _profile = profile;
         foreach (var property in new[] { nameof(HasProfile), nameof(NeedsProfile), nameof(HasDocument), nameof(NeedsDocument), nameof(Document),
             nameof(GivenName), nameof(Surname), nameof(DocumentNumber), nameof(FiscalCode), nameof(CertificateSubject), nameof(CertificateIssuer),
             nameof(CertificateValidity), nameof(CertificateSerial), nameof(CertificateFingerprint), nameof(DocumentBirth), nameof(DocumentExpiry),
-            nameof(Nationality), nameof(Sex), nameof(CanImportDocument) }) Notify(property);
+            nameof(Nationality), nameof(Sex), nameof(CanImportDocument), nameof(ProfileStorageNotice) }) Notify(property);
     }
     private static string Display(string? value) => string.IsNullOrWhiteSpace(value) ? "Non disponibile" : value;
     private static string MrzDate(string? value) => value?.Length == 6 ? $"{value[4..6]}/{value[2..4]}/{value[..2]}" : "Non disponibile";
@@ -317,16 +349,26 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private async Task ForgetCardAsync()
     {
-        if (Busy || _registered is null || _credentials is null) return;
+        if (Busy || _registered is null) return;
         Busy = true;
         using var operation = new CancellationTokenSource(TimeSpan.FromSeconds(30));
         _operation = operation;
         try
         {
-            if (_profiles is not null) await _profiles.DeleteProfileAsync(_registered, operation.Token);
-            await _credentials.ForgetAsync(_registered, operation.Token);
+            if (_vault is not null)
+            {
+                if (_vault.IsUnlocked && await _vault.GetRegistrationAsync(operation.Token) == _registered)
+                    await _vault.ForgetAsync(_registered, operation.Token);
+            }
+            else if (_credentials is not null)
+            {
+                if (_profiles is not null) await _profiles.DeleteProfileAsync(_registered, operation.Token);
+                await _credentials.ForgetAsync(_registered, operation.Token);
+            }
+            operation.Token.ThrowIfCancellationRequested();
+            _profileSaved = false; NotifyVault();
             _registered = null; Pin = ""; Can = ""; Certificate = ""; SetProfile(null); SelectedTab = 0; ClearCompletion(); RegistrationChanged();
-            Status = "Carta e PIN rimossi"; Detail = "Dati, foto, certificato e PIN sono stati rimossi dal portachiavi."; Error = false;
+            Status = "Carta e PIN rimossi"; Detail = "Dati, foto, certificato e PIN della carta sono stati rimossi dall’app."; Error = false;
         }
         catch (CredentialStoreException e) { Error = true; Status = "Rimozione non completata"; Detail = e.Message; }
         catch (OperationCanceledException) { Status = "Rimozione annullata"; }
@@ -336,7 +378,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private void RegistrationChanged()
     {
-        Notify(nameof(HasRegistration)); Notify(nameof(NeedsProfile)); Notify(nameof(EnterPin)); Notify(nameof(CanContinue)); Notify(nameof(CanRegister));
+        Notify(nameof(HasRegistration)); Notify(nameof(HasSavedPin)); Notify(nameof(NeedsProfile)); Notify(nameof(EnterPin)); Notify(nameof(CanContinue)); Notify(nameof(CanRegister));
     }
 
     private void OnProgress(CieProgress progress)
@@ -385,6 +427,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public void OnDeactivated()
     {
         Cancel(); Pin = ""; Can = ""; Certificate = ""; Otp = "";
+        VaultPassphrase = ""; VaultConfirmation = "";
+        if (_vault is not null) LockVault();
     }
     private void ClearCompletion() { _completion = null; Otp = ""; Notify(nameof(HasCompletion)); }
     private (CieAuthenticationRequest? Mobile, CieQrAuthenticationRequest? Qr) ParseRequest() => IsQrRequest

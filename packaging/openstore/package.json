@@ -1,20 +1,25 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "architecture": "arm64",
-  "filename": "utcieid.milattanzio_0.2.0_arm64.click",
-  "bytes": 46666918,
-  "sha256": "fdde5cced54412ce9026bb64502b23ec60e87d1deb973504d5a1a95bb27f30b3",
-  "automated_tests_passed": 182,
-  "automatic_keyring_permission": false,
-  "status": "uploaded_unpublished_manual_permission_review_requested",
+  "filename": "utcieid.milattanzio_0.3.0_arm64.click",
+  "bytes": 46682292,
+  "sha256": "22bccbbf279766ed17c3285f6996592892a93856a0ea9f5be6047cd6868e8aba",
+  "automated_tests_passed": 203,
+  "requires_keyring_permission": false,
+  "status": "uploaded_ready_to_publish",
   "maintainer": "Mi Lattanzio <mi@polecola.it>",
   "device_verification": {
     "device": "Fairphone 5",
     "os": "Ubuntu Touch 24.04.5",
-    "installed_sha256_matches": true,
     "apparmor": "enforce",
-    "synthetic_keyring_probe": "passed",
-    "keyring_extension": "previously_authorized_app_profile_only"
+    "synthetic_vault_probe": "passed",
+    "secret_service_access": "denied_by_standard_profile",
+    "legacy_data_migration": "verified_and_confirmed_by_user",
+    "vault_file_mode": "0600",
+    "release_ui_reopen": "passed_with_real_card_and_saved_pin",
+    "installed_sha256_matches": true,
+    "manual_pin_with_locked_vault": "passed_with_real_card"
   },
-  "automated_store_review": "passed"
+  "automated_store_review": "passed",
+  "targeted_vault_ui_tests_passed": 9
 }

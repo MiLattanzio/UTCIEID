@@ -4,7 +4,7 @@
   "license": "Other Open Source",
   "license_detail": "BSD-3-Clause; bundled components retain their MIT, Apache-2.0, OFL and other notices.",
   "tagline": "La tua CIE su Ubuntu Touch: NFC, QR e accesso di livello 3.",
-  "description": "UTCIEID è un client indipendente per usare la Carta d'Identità Elettronica italiana su Ubuntu Touch. Non è l'app ufficiale CieID e non è affiliato al Ministero dell'Interno o a IPZS.\n\nFunzioni: riconoscimento CIE via NFC con vibrazione, autenticazione di livello 3, scansione QR dalla fotocamera con autofocus e codice OTP da riportare sul computer. Il flusso QR/NFC/OTP è stato verificato fino all'accesso a MyINPS su Fairphone 5.\n\nLa registrazione della carta conserva il PIN completo nel portachiavi di sistema. Il tab Dati permette di conservare anagrafica e certificato di autenticazione; foto e dati ICAO si importano con il CAN della carta. Queste funzioni richiedono accesso a Secret Service: la configurazione aggiuntiva AppArmor della versione di sviluppo non è inclusa nel profilo Click standard. La distribuzione completa è soggetta alla revisione dei permessi.\n\nRequisiti: Ubuntu Touch 24.04-2.x ARM64, CIE 3.0, NFC, PIN della carta e Internet per autenticarsi. Fotocamera richiesta solo per scansionare il QR. I fotogrammi non vengono salvati. Nessuna pubblicità o telemetria. La chiave privata resta nella CIE.\n\nAnteprima sperimentale. Livello 2, notifiche push, recupero PIN, sblocco PUK e lettura delle impronte digitali non sono inclusi. Il flusso OpenApp è implementato ma non ancora verificato con una richiesta reale. La verifica della catena CSCA dei dati ICAO non è implementata.\n\nLe schermate mostrano l'interfaccia reale con dati dimostrativi e un'icona al posto della foto. Nessun dato personale reale è incluso. Sorgenti BSD-3-Clause, frontend Avalonia/AXAML; attribuzioni delle dipendenze nel repository.\n\nPrivacy: https://github.com/MiLattanzio/UTCIEID/blob/master/docs/privacy.md",
+  "description": "UTCIEID è un client indipendente per usare la Carta d'Identità Elettronica italiana su Ubuntu Touch. Non è l'app ufficiale CieID e non è affiliato al Ministero dell'Interno o a IPZS.\n\nFunzioni: riconoscimento CIE via NFC con vibrazione, autenticazione di livello 3, scansione QR dalla fotocamera con autofocus e codice OTP da riportare sul computer. Il flusso QR/NFC/OTP è stato verificato fino all'accesso a MyINPS su Fairphone 5.\n\nPuoi inserire il PIN a ogni utilizzo oppure creare un archivio locale cifrato con una passphrase separata, per conservare anagrafica, foto e certificato. Il salvataggio del PIN completo è facoltativo e va selezionato esplicitamente. L'archivio si blocca quando lasci l'app e richiede la passphrase per essere riaperto. Se la dimentichi, puoi eliminare l'archivio e rileggere la CIE. Foto e dati ICAO si importano con il CAN della carta, che non viene salvato. L'app usa il confinamento standard di Ubuntu Touch, senza accesso al portachiavi o modifiche ai permessi di sistema.\n\nRequisiti: Ubuntu Touch 24.04-2.x ARM64, CIE 3.0, NFC, PIN della carta e Internet per autenticarsi. Fotocamera richiesta solo per scansionare il QR. I fotogrammi non vengono salvati. Nessuna pubblicità o telemetria. La chiave privata resta nella CIE.\n\nAnteprima sperimentale. Livello 2, notifiche push, recupero PIN, sblocco PUK e lettura delle impronte digitali non sono inclusi. Il flusso OpenApp è implementato ma non ancora verificato con una richiesta reale. La verifica della catena CSCA dei dati ICAO non è implementata.\n\nLe schermate mostrano l'interfaccia reale con dati dimostrativi e un'icona al posto della foto. Nessun dato personale reale è incluso. Sorgenti BSD-3-Clause, frontend Avalonia/AXAML; attribuzioni delle dipendenze nel repository.\n\nPrivacy: https://github.com/MiLattanzio/UTCIEID/blob/master/docs/privacy.md",
   "category": "Utilities",
   "keywords": [
     "CIE",
@@ -19,19 +19,19 @@
   "source_url": "https://github.com/MiLattanzio/UTCIEID",
   "support_url": "https://github.com/MiLattanzio/UTCIEID/issues",
   "privacy_url": "https://github.com/MiLattanzio/UTCIEID/blob/master/docs/privacy.md",
-  "version": "0.2.0",
-  "changelog": "Prima preparazione per OpenStore: SDK C#, lettura NFC, registrazione tramite portachiavi, dati e certificato, foto ICAO con CAN, QR con fotocamera, autofocus e OTP di livello 3. Verificati 182 test automatici e accesso reale a MyINPS. Permessi per il portachiavi in valutazione per la distribuzione.",
+  "version": "0.3.0",
+  "changelog": "Archivio locale cifrato con passphrase separata, blocco automatico quando lasci l’app e PIN manuale sempre disponibile. Salvataggio del PIN facoltativo, rimozione separata del PIN e cancellazione confermata dell’archivio. Eliminata la dipendenza dal portachiavi: profilo Click standard con NFC, rete e fotocamera. Schermate aggiornate con soli dati dimostrativi.",
   "screenshots": [
     "01-cie.png",
     "02-accesso-qr.png",
     "03-dati-dimostrativi.png",
     "04-certificato-dimostrativo.png",
-    "05-informazioni.png"
+    "05-archivio-cifrato.png"
   ],
-  "publication_status": "draft_not_published",
+  "publication_status": "uploaded_ready_to_publish",
   "management_url": "https://open-store.io/manage/utcieid.milattanzio/",
   "maintainer": "Mi Lattanzio <mi@polecola.it>",
-  "manual_review_status": "request_sent_awaiting_response",
+  "manual_review_status": "secret_service_design_replaced_no_explicit_reviewer_approval",
   "manual_review_sent_at": "2026-11-26 20:49 Europe/Rome",
   "manual_review_channel": "https://web.telegram.org/k/#-1358111548"
 }

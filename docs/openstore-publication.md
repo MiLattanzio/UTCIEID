@@ -1,50 +1,44 @@
-# Preparazione OpenStore — 26 novembre 2026
+# OpenStore — versione 0.3.0, 28 novembre 2026
 
-La scheda [UTCIEID su OpenStore](https://open-store.io/manage/utcieid.milattanzio/)
-è salvata nell'account del maintainer come **bozza non pubblicata**. Il collegamento
-di gestione richiede l'accesso all'account proprietario.
+Il pacchetto 0.3.0 è stato caricato nella
+[scheda UTCIEID](https://open-store.io/manage/utcieid.milattanzio/) e ha superato
+il controllo automatico di OpenStore. L'attivazione della pubblicazione è il
+passaggio finale, dopo l'aggiornamento dei sorgenti.
 
-Sono stati caricati descrizione, categoria Utilities, parole chiave, sorgenti,
-supporto, informativa privacy e note della versione 0.2.0. Le cinque schermate
-provengono dall'interfaccia AXAML reale con fixture sintetiche: nessun dato della
-CIE usata nelle prove. Generatore, immagini e hash sono in
+## Pacchetto verificato
+
+- `utcieid.milattanzio_0.3.0_arm64.click`, 46.682.292 byte.
+- SHA-256: `22bccbbf279766ed17c3285f6996592892a93856a0ea9f5be6047cd6868e8aba`.
+- Ubuntu Touch `24.04-2.x`, architettura ARM64.
+- Maintainer: `Mi Lattanzio <mi@polecola.it>`.
+- Profilo standard: `networking`, `nfc`, `camera`; nessun permesso del portachiavi.
+- 203 test automatici superati; nove test mirati rieseguiti dopo la correzione
+  del messaggio di blocco dell'archivio, tutti superati.
+- Installazione su Fairphone 5 con AppArmor `enforce`; prova sintetica dell'archivio
+  riuscita e accesso a Secret Service respinto dal profilo standard.
+- Trasferimento verificato della carta precedente; l'utente ha confermato dati,
+  foto e certificato, lettura usando il PIN salvato e lettura con PIN manuale.
+
+Le cinque schermate provengono dall'interfaccia AXAML reale con fixture sintetiche.
+Mostrano CIE, QR, dati dimostrativi, certificato e archivio cifrato. Nessun dato della
+CIE usata nelle prove è incluso. Generatore, immagini e hash sono in
 [`packaging/openstore/screenshots`](../packaging/openstore/screenshots/).
 
-## Pacchetto caricato
+## Superamento della soluzione Secret Service
 
-- `utcieid.milattanzio_0.2.0_arm64.click`, 46.666.918 byte.
-- Ubuntu Touch `24.04-2.x`, architettura ARM64.
-- Maintainer: `Mi Lattanzio <mi@polecola.it>`, come indicato dall'utente.
-- SHA-256: `fdde5cced54412ce9026bb64502b23ec60e87d1deb973504d5a1a95bb27f30b3`.
-- Controlli automatici OpenStore superati; caricamento confermato dal sito.
-- Suite: 182 test passati. Pacchetto installato sul Fairphone 5, portachiavi
-  sintetico verificato e AppArmor in modalità enforce.
+La bozza 0.2.0 usava il portachiavi di sistema nel dispositivo di sviluppo, tramite
+un'estensione del profilo AppArmor autorizzata localmente. Il Click standard non
+installava quel permesso. La richiesta di revisione è stata inviata il 26 novembre
+2026 nel gruppo Telegram ufficiale OpenStore; la discussione ha evidenziato
+l'assenza di isolamento dei segreti per applicazione.
 
-La prima verifica automatica aveva rifiutato il formato incompleto del campo
-maintainer. Il pacchetto sopra corregge quel campo e ha superato il controllo.
-Le funzioni dell'app restano quelle verificate nelle [prove](verification.md).
+La 0.3.0 sostituisce quel backend con un archivio locale cifrato a passphrase,
+mantenendo il PIN manuale. Il vecchio backend è escluso dalle build ordinarie.
+Non vengono richieste modifiche manuali di AppArmor agli utenti. Il trasferimento
+della registrazione di sviluppo è stato effettuato con una build temporanea,
+mai caricata sullo store, verificando la copia prima di rimuovere i vecchi segreti.
 
-## Revisione manuale richiesta, in attesa di risposta
-
-L'esito automatico riguarda il profilo standard con networking, NFC e fotocamera.
-**Non approva né installa il permesso Secret Service** necessario a conservare PIN,
-dati e foto. Il telefono di sviluppo usa la sola estensione app-specifica già
-autorizzata; il Click non modifica automaticamente AppArmor su altri telefoni.
-
-La scelta dell'utente è conservare tutte le funzioni e preparare la revisione
-manuale. Non sono stati aggiunti un profilo unconfined o accesso indiscriminato
-al session bus. La pubblicazione resta disattivata finché i manutentori non
-indicano e approvano una modalità di distribuzione adatta per il portachiavi.
-
-La [richiesta inviata](../packaging/openstore/manual-review-request.txt) contiene
-sorgenti, istruzioni di build, impronta del pacchetto, permessi esatti e limiti di
-isolamento di Secret Service. Su istruzione esplicita del maintainer è stata
-inviata il **26 novembre 2026 alle 20:49 (Europe/Rome)** nel
-[gruppo Telegram ufficiale OpenStore](https://web.telegram.org/k/#-1358111548),
-indicato nelle [regole OpenStore](https://open-store.io/submit/). Il messaggio
-pubblicato è stato verificato nell'interfaccia Telegram; non è un'approvazione
-del permesso né la conferma dell'avvio della revisione da parte dei manutentori.
-
-Il passaggio successivo è ricevere le indicazioni dei manutentori, concordare i
-permessi, quindi verificare l'installazione senza modifiche manuali prima di
-rendere pubblica la versione completa.
+Non si presenta la discussione Telegram come approvazione formale dei revisori:
+il risultato osservato per la 0.3.0 è il superamento dei controlli automatici sul
+pacchetto confinato. La [privacy](privacy.md), il [formato dell'archivio](vault.md)
+e le [verifiche](verification.md) descrivono comportamento e limiti della versione.

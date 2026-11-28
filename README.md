@@ -8,17 +8,14 @@ Il protocollo è derivato dall'SDK Android IPZS; non è l'app ufficiale CieID.
 Anteprima di sviluppo per Ubuntu Touch 24.04 ARM64. Sono implementati selezione
 IAS/CIE, canale DH/DAPP, secure messaging, verifica PIN, lettura del certificato,
 firma della challenge OpenApp, continuazione nel browser e flusso QR di livello 3
-con OTP e autenticazione TLS tramite la carta. La registrazione salva
-il PIN completo nel portachiavi persistente di sistema, su richiesta dell'utente.
-Il tab **Dati** conserva anche anagrafica e certificato DER completo; la foto e i
-dati ICAO si importano con il CAN stampato sul documento.
+con OTP e autenticazione TLS tramite la carta. Il PIN può essere inserito a ogni
+utilizzo oppure salvato in un **archivio locale cifrato**, sbloccato con una passphrase
+separata. Il tab **Dati** mostra anagrafica e certificato DER completo; foto e dati
+ICAO si importano con il CAN stampato sul documento. Senza archivio i dati restano
+solo nella sessione. L'archivio si blocca quando l'app perde il primo piano.
 
-La lettura del certificato e la registrazione con PIN completo nel portachiavi sono
-state verificate con una CIE reale su Fairphone 5, con AppArmor attivo. È stato
-verificato anche il riuso del PIN dal portachiavi dopo chiusura e riapertura dell'app,
-oltre al canale DH/DAPP senza inviare PIN. Il nuovo tab Dati e l’importazione
-della foto tramite PACE DH/CAN sono stati verificati sulla stessa CIE reale;
-foto, anagrafica e certificato sono rimasti disponibili dopo il riavvio dell’app.
+Le letture NFC del certificato e della foto tramite PACE DH/CAN sono state verificate
+con una CIE reale su Fairphone 5, con AppArmor attivo.
 Il flusso QR di livello 3 è stato verificato fino all'accesso reale a MyINPS:
 firma NFC, autenticazione TLS della carta, OTP nell'app e conferma nel browser.
 La scansione dalla fotocamera è stata verificata sullo stesso telefono con un QR
@@ -31,24 +28,28 @@ La [privacy dell'app](docs/privacy.md) descrive conservazione locale e dati
 trasmessi per l'autenticazione. Le [schermate dimostrative](packaging/openstore/screenshots/)
 sono generate dall'AXAML con dati sintetici e non contengono dati personali reali.
 
-Il pacchetto 0.2.0 e le cinque schermate sono caricati in una bozza OpenStore.
-La pubblicazione della versione completa attende la revisione del permesso per
-il portachiavi; dettagli e richiesta pronta in [stato OpenStore](docs/openstore-publication.md).
+La versione 0.3.0 usa il profilo Click standard: rete, NFC e fotocamera.
+Non richiede accesso al portachiavi, modifiche AppArmor o comandi nel Terminale.
+Stato della distribuzione: [OpenStore](docs/openstore-publication.md).
 
 ## Uso
 
 1. Attiva NFC e apri **Trova la CIE (senza PIN)**. Sposta lentamente la carta sul
    retro: una vibrazione e **Carta rilevata: tienila ferma** segnalano l'aggancio.
    L'avviso resta sopra il contenuto durante la lettura.
-2. Inserisci il PIN di otto cifre e lascia selezionata la registrazione, poi premi
-   **Leggi la tua CIE**. Il PIN è salvato soltanto dopo una lettura riuscita.
-3. Con la carta registrata, **Usa il PIN dal portachiavi** evita di reinserirlo.
-   Nel nuovo tab **Dati** trovi nome, cognome, numero del documento, codice fiscale
-   e certificato (intestatario, emittente, validità, seriale, impronta SHA-256).
-   Per le registrazioni precedenti, premi **Importa dati e certificato** una volta.
-   Per la foto inserisci il **CAN di 6 cifre** nel tab Dati, premi **Importa foto e
-   dati** e mantieni ferma la carta. Il CAN non viene salvato e questa operazione
-   non usa il PIN. **Dimentica carta, dati e PIN** elimina tutti i dati salvati.
+2. Per il PIN manuale, inserisci le otto cifre e premi **Leggi la tua CIE**.
+   Per conservare la carta, apri prima **Archivio della carta**, scegli e conferma
+   una passphrase di almeno 12 caratteri (preferibilmente più parole), quindi crea
+   l'archivio. Lascia selezionato il salvataggio dei dati e scegli separatamente
+   **Salva anche il PIN nell'archivio dopo la lettura**, se lo desideri.
+   Il PIN viene salvato soltanto dopo una lettura riuscita.
+3. Nel tab **Dati** trovi nome, cognome, numero del documento, codice fiscale e
+   certificato. Per la foto inserisci il **CAN di 6 cifre**, premi **Importa foto e
+   dati** e mantieni ferma la carta. Il CAN non viene salvato e non usa il PIN.
+   Dopo la riapertura sblocca l'archivio per ritrovare i dati e usare l'eventuale PIN
+   salvato. Puoi rimuovere solo il PIN, dimenticare la carta o eliminare l'archivio.
+   **Non esiste recupero della passphrase**: se la dimentichi, elimina l'archivio
+   e rileggi la CIE. Il PIN manuale resta disponibile anche con archivio bloccato.
 4. Per l'accesso da computer, scegli sul sito **Entra con lettura carta** e
    **Prosegui con smartphone**. Nel tab **Accedi**, premi **Scansiona QR** e inquadra
    il codice di livello 3 con la fotocamera posteriore. Consenti l'accesso alla
@@ -120,28 +121,31 @@ dotnet build src/UTCIEID.App/UTCIEID.App.csproj -c Release --disable-build-serve
 ./scripts/install-device.sh
 ```
 
-Il pacchetto è `artifacts/click/utcieid.milattanzio_0.2.0_arm64.click`.
+Il pacchetto è `artifacts/click/utcieid.milattanzio_0.3.0_arm64.click`.
 Il launcher predefinito usa X11/XMir. `UTCIEID_BACKEND=wayland` seleziona il backend
 Wayland; questa app è stata provata sul telefono con X11.
 `-p:UseAvaloniaSource=false` usa i pacchetti Avalonia 12.1.6 per sviluppo desktop,
 senza garantire le integrazioni Ubuntu Touch presenti nel fork.
 
-## Portachiavi su Ubuntu Touch
+## Archivio cifrato
 
-Il profilo Click standard consente NFC e rete, ma non Secret Service. La funzione
-richiede l'estensione specifica descritta in [portachiavi](docs/keyring.md).
-Se il servizio è bloccato o indisponibile, il PIN non viene salvato in un file come
-fallback. L'app resta confinata da AppArmor anche con l'estensione.
+L'archivio usa Argon2id (64 MiB, tre iterazioni) e AES-256-GCM con salt e nonce
+casuali. La passphrase non è salvata; nessun identificativo della carta è scritto
+in chiaro nei metadati. File alterati o passphrase errate non sbloccano l'archivio.
+Formato, limiti e modello di protezione: [archivio](docs/vault.md).
+Il vecchio backend Secret Service è escluso dalle build ordinarie e dal pacchetto
+OpenStore. È mantenuto solo per la migrazione locale della precedente versione
+di sviluppo; non è necessario per installare o usare la versione distribuita.
 
 ## Struttura e licenze
 
 | Percorso | Funzione |
 | --- | --- |
 | `src/UTCie.Sdk` | Protocollo carta, crittografia, richieste di autenticazione |
-| `src/UTCie.Linux` | nfcd, libsecret, apertura browser e feedback aptico Lomiri |
+| `src/UTCie.Linux` | nfcd, archivio cifrato, browser e feedback aptico Lomiri |
 | `src/UTCIEID.App` | Interfaccia AXAML e stato dell'app |
 | `tests/UTCie.Tests` | Vettori crittografici, simulatore carta, D-Bus e regressioni |
-| `packaging` e `scripts` | Click ARM64 e regola opzionale del portachiavi |
+| `packaging` e `scripts` | Click ARM64 confinato e strumenti di sviluppo |
 
 La derivazione IPZS usa BSD-3-Clause; le attribuzioni Avalonia e Tmds.DBus sono in
 `licenses/`, insieme agli avvisi di .NET, SkiaSharp, HarfBuzzSharp, Inter e delle
