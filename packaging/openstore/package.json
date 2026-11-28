@@ -6,7 +6,7 @@
   "sha256": "22bccbbf279766ed17c3285f6996592892a93856a0ea9f5be6047cd6868e8aba",
   "automated_tests_passed": 203,
   "requires_keyring_permission": false,
-  "status": "uploaded_ready_to_publish",
+  "status": "published",
   "maintainer": "Mi Lattanzio <mi@polecola.it>",
   "device_verification": {
     "device": "Fairphone 5",
@@ -21,5 +21,7 @@
     "manual_pin_with_locked_vault": "passed_with_real_card"
   },
   "automated_store_review": "passed",
-  "targeted_vault_ui_tests_passed": 9
+  "targeted_vault_ui_tests_passed": 9,
+  "public_url": "https://open-store.io/app/utcieid.milattanzio/",
+  "published_date": "2026-11-28"
 }

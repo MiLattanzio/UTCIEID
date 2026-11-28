@@ -30,7 +30,8 @@ sono generate dall'AXAML con dati sintetici e non contengono dati personali real
 
 La versione 0.3.0 usa il profilo Click standard: rete, NFC e fotocamera.
 Non richiede accesso al portachiavi, modifiche AppArmor o comandi nel Terminale.
-Stato della distribuzione: [OpenStore](docs/openstore-publication.md).
+La versione 0.3.0 è disponibile su [OpenStore](https://open-store.io/app/utcieid.milattanzio/).
+Dettagli della [pubblicazione](docs/openstore-publication.md).
 
 ## Uso
 

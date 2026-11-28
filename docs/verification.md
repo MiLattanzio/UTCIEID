@@ -31,6 +31,8 @@ Backend UI provato: X11/XMir con il fork Avalonia e Maliit integrato.
 - Click finale: 46.682.292 byte, SHA-256
   `22bccbbf279766ed17c3285f6996592892a93856a0ea9f5be6047cd6868e8aba`.
   Audit di 276 elementi: nessun PDB, chiave privata o archivio personale.
+- Controlli automatici OpenStore superati; pubblicazione attivata il 28 novembre
+  2026. Verificate pagina pubblica, versione 0.3.0 e cinque schermate dimostrative.
 
 Le sezioni successive documentano le prove precedenti, compreso il vecchio
 portachiavi di sviluppo, sostituito nella versione 0.3.0.

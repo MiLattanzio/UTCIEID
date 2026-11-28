@@ -28,10 +28,12 @@
     "04-certificato-dimostrativo.png",
     "05-archivio-cifrato.png"
   ],
-  "publication_status": "uploaded_ready_to_publish",
+  "publication_status": "published",
   "management_url": "https://open-store.io/manage/utcieid.milattanzio/",
   "maintainer": "Mi Lattanzio <mi@polecola.it>",
   "manual_review_status": "secret_service_design_replaced_no_explicit_reviewer_approval",
   "manual_review_sent_at": "2026-11-26 20:49 Europe/Rome",
-  "manual_review_channel": "https://web.telegram.org/k/#-1358111548"
+  "manual_review_channel": "https://web.telegram.org/k/#-1358111548",
+  "public_url": "https://open-store.io/app/utcieid.milattanzio/",
+  "published_date": "2026-11-28"
 }

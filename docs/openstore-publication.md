@@ -1,9 +1,9 @@
 # OpenStore — versione 0.3.0, 28 novembre 2026
 
-Il pacchetto 0.3.0 è stato caricato nella
-[scheda UTCIEID](https://open-store.io/manage/utcieid.milattanzio/) e ha superato
-il controllo automatico di OpenStore. L'attivazione della pubblicazione è il
-passaggio finale, dopo l'aggiornamento dei sorgenti.
+**UTCIEID 0.3.0 è pubblicata e installabile da
+[OpenStore](https://open-store.io/app/utcieid.milattanzio/).** La pagina pubblica,
+la versione corrente e le cinque schermate dimostrative sono state verificate
+il 28 novembre 2026. Il pacchetto ha superato i controlli automatici dello store.
 
 ## Pacchetto verificato
 
